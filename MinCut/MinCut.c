@@ -42,7 +42,8 @@ ReadFileToAdjList (
   int ttsize; 
   long ttInv;
   int nnn; // number of vertices
-  int collect;
+  short collect;
+  short newline;
   int **tt;
   int *ttAlt;
   char file_name[100] = "";
@@ -50,6 +51,7 @@ ReadFileToAdjList (
   FILE *fp;
   char ch;
   int i;
+  int j;
   int vertexindex;
 
   printf ("Type File name:");
@@ -77,6 +79,7 @@ ReadFileToAdjList (
   }
   ch = 0;
   i = 0;
+  num = 0;
   while (((ch = fgetc (fp)) != EOF)) {
     //
     // If get a number, collect it in num.
@@ -86,14 +89,15 @@ ReadFileToAdjList (
       //printf ("_%d_ ", (ch - 0x30));
       num = num * 10 + (ch - 0x30);
       collect = 1;
-    } 
-    else {
+    } else {
       //printf ("Got non-numeric char!\n");
 
-      //
-      // If get a non-numeric char, put num into array.
-      //
       /*
+      //
+      // If array is running out of space,
+      // double it before putting anything in it.
+      //
+
       if (i >= nnn) {
 
         //
@@ -108,18 +112,41 @@ ReadFileToAdjList (
         free (ttAlt);
       }
       */
+
+      //if ((ch <= 0xD && ch >= 0xA) || ch == 0x85 || ch == 0x2028 || ch == 0x2029) {
+      if (ch <= 0xD && ch >= 0xA) {
+      
+        //
+        // a line terminator is found,
+        // the next num if any should be store in next tt[i]
+        //
+
+        if (newline == 0) {
+          i++;
+          j = 0;
+        }
+        newline = 1;
+      }
+
+      //
+      // If a non-numeric char is reached, put num into array.
+      //
+
       if (collect == 1) {
-        collect = 0;
         printf ("%d\n", num);
-        tt [i] = num;
+        *(tt [i] + j) = num;
         num = 0;
-        i++;
+        collect = 0;
+        newline = 0;
+
+        printf ("tt [%d] + %d (%p) = %d\n", i, j, tt[i]+j, *(tt[i]+j));
+        j++;
       }
     }
   }
   ttsize = i;
   //ttsize = 999;
-  **pArray = tt;
+  *pArray = tt;
   
   fclose (fp);
   return;
