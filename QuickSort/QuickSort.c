@@ -5,18 +5,32 @@
 //  Created by Ivy on 5/30/2016
 //  Copyright (c) 2016 ___IVYCANT___. All rights reserved.
 //
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+
 long gComparison;
 char gPivotPolicy;
+
 #define CHOOSE_PIVOT_LEFTMOST 'l'
 #define CHOOSE_PIVOT_RIGHTMOST 'r'
 #define CHOOSE_PIVOT_MEDIAN 'm'
 
+//
+//  Description: 
+//    print array with comma and semicolon
+//
+
 void 
-printArray (int *A, int l ,int r, int commaBefore, int semicolonBefore)
+printArray (
+  int *A,
+  int l ,
+  int r, 
+  int commaBefore, 
+  int semicolonBefore
+  )
 {
   int i;
   i = 0;
@@ -34,8 +48,17 @@ printArray (int *A, int l ,int r, int commaBefore, int semicolonBefore)
  
 }
 
+//
+//  Description: 
+//    swap two elements in an array
+//
+
 void 
-Swap (int* A, int index1, int index2) 
+Swap (
+  int* A, 
+  int index1, 
+  int index2
+  ) 
 {
   int temp;
   temp = A[index1];
@@ -43,16 +66,28 @@ Swap (int* A, int index1, int index2)
   A [index2] = temp;
 }
 
+//
+//  Description: 
+//    Choose a pivot vased on pivot policy passed in as
+//    the fourth parameter. There are 3 options.
+//    1) CHOOSE_PIVOT_LEFTMOST if user input 'l'
+//    2) CHOOSE_PIVOT_RIGHTMOST if user input 'r'
+//    3) CHOOSE_PIVOT_MEDIAN if user input 'm'
+//    If not specified, then CHOOSE_PIVOT_LEFTMOST policy is used.
+//
+
 int 
-ChoosePivot (int* inputArray, int leftmost, int rightmost, int policy)
+ChoosePivot (
+  int* inputArray, 
+  int leftmost, 
+  int rightmost, 
+  int policy
+  )
 {
   int index;
   int a,b,c;
   int middleIndex;
   switch (policy) {
-    case CHOOSE_PIVOT_LEFTMOST:
-      index = leftmost; 
-      break;
     case CHOOSE_PIVOT_RIGHTMOST:
       index = rightmost;
       break;
@@ -84,8 +119,10 @@ ChoosePivot (int* inputArray, int leftmost, int rightmost, int policy)
         index = rightmost;
       }
       break;
+    case CHOOSE_PIVOT_LEFTMOST:
     default:
-      printf("WARNING!!!!!!!!! Pivot choosing policy error!!!!!!\n");
+      index = leftmost; 
+      
   }
 
   return index;
@@ -115,7 +152,7 @@ Partition (
   gComparison += length - 1;
   printf ("%ld\n", gComparison);
 
-  pivotIndex = ChoosePivot(A, l, r, gPivotPolicy); // to add
+  pivotIndex = ChoosePivot(A, l, r, gPivotPolicy);
   pivot = A[pivotIndex];
   
   printf (" pivot: A[%d]=%d\n", pivotIndex, pivot);
