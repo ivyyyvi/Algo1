@@ -1,6 +1,0 @@
-Choose first element as pivot
-162085 correct
-Choose last element as pivot
-164123 correct
-Choose "median-of-three" as pivot
-138382
