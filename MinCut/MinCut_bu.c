@@ -81,17 +81,32 @@ ReadFileToAdjList (
 
   char ch;
   int ttsize; 
+<<<<<<< HEAD
   int collect;
   int newline = 1;
 
   //char file_name[100] = "";
+=======
+  long ttInv;
+  int nnn; // number of vertices
+  short collect;
+  short newline;
+  int **tt;
+  int *ttAlt;
+  char file_name[100] = "";
+>>>>>>> 4b2c1ad51f38b646562518add6adbc894183c03b
   char *tracker;
   FILE *fp;
 
   int i;
+<<<<<<< HEAD
   int vertexIndex;
   int edgeIndex;
   int edgePool;
+=======
+  int j;
+  int vertexindex;
+>>>>>>> 4b2c1ad51f38b646562518add6adbc894183c03b
 
   vertex *pv; // array of vertices
   edge *pe; // array of edges
@@ -151,9 +166,12 @@ fp = fopen ("k.txt", "r");//hard code file name temporarily
   ch = 0;
   i = 0;
   num = 0;
+<<<<<<< HEAD
   vertexIndex = 0;
   pCurrentVertex = &pv[vertexIndex];
   pCurrentVertex->degree = 0;
+=======
+>>>>>>> 4b2c1ad51f38b646562518add6adbc894183c03b
   while (((ch = fgetc (fp)) != EOF)) {
 
     //
@@ -166,12 +184,17 @@ fp = fopen ("k.txt", "r");//hard code file name temporarily
     } else {
       //printf ("Got non-numeric char!\n");
 
-      
+      /*
       //
       // If array is running out of space,
       // double it before putting anything in it.
       //
+<<<<<<< HEAD
       if (vertexIndex >= nnn) {
+=======
+
+      if (i >= nnn) {
+>>>>>>> 4b2c1ad51f38b646562518add6adbc894183c03b
 
         //
         // If array size is not enought, reallocate the array of vertices to double its size.
@@ -183,6 +206,7 @@ fp = fopen ("k.txt", "r");//hard code file name temporarily
         //printf ("\n[DEBUG] new line found...(0x%x)\n", ch);
         newline = 1;
       }
+<<<<<<< HEAD
 
       if (collect == 1) { // if a number is read
         collect = 0;
@@ -190,8 +214,8 @@ fp = fopen ("k.txt", "r");//hard code file name temporarily
 
         if (newline) { // a newline not yet cleared means this is a new vertex
           newline = 0; // clear the newline flag
-
-/*if (edgeCount == 0) {
+/*
+if (edgeCount == 0) {
 gMaxEdgeIncident = pCurrentVertex->degree;
 } else {
 if (pCurrentVertex->degree > gMaxEdgeIncident) {
@@ -233,6 +257,44 @@ if (vertexIndex - 1 >= 0) {
   *numberEdges = edgeIndex;
   *V = pv;
   *E = pe;
+=======
+      */
+
+      //if ((ch <= 0xD && ch >= 0xA) || ch == 0x85 || ch == 0x2028 || ch == 0x2029) {
+      if (ch <= 0xD && ch >= 0xA) {
+      
+        //
+        // a line terminator is found,
+        // the next num if any should be store in next tt[i]
+        //
+
+        if (newline == 0) {
+          i++;
+          j = 0;
+        }
+        newline = 1;
+      }
+
+      //
+      // If a non-numeric char is reached, put num into array.
+      //
+
+      if (collect == 1) {
+        printf ("%d\n", num);
+        *(tt [i] + j) = num;
+        num = 0;
+        collect = 0;
+        newline = 0;
+
+        printf ("tt [%d] + %d (%p) = %d\n", i, j, tt[i]+j, *(tt[i]+j));
+        j++;
+      }
+    }
+  }
+  ttsize = i;
+  //ttsize = 999;
+  *pArray = tt;
+>>>>>>> 4b2c1ad51f38b646562518add6adbc894183c03b
   
   fclose (fp);
   return;
