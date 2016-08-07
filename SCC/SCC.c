@@ -67,6 +67,7 @@ ReadFileToAdjList (
   )
 {
   int num;
+  int num_max = 0;
   long int mmm; // max number of edges just for alloc
   long int mmm_reverse; // max number of edges just for alloc
   int degreeMax = 5;
@@ -185,7 +186,14 @@ ReadFileToAdjList (
 
       if (collect == 1) { // if a number is read
         collect = 0;
-        //DEBUG ("Finish collecting a number: %d---\n", num);
+        
+        //
+        // use max of num saw to be the vertices number
+        // this assumes vertices index are continual no skipping
+        //
+        if (num > num_max) {
+          num_max = num;
+        }
 
         if (edgeStart) {
           edgeStart = 0;
@@ -210,6 +218,7 @@ ReadFileToAdjList (
           
         } else { 
           edgeStart = 1;
+
           //
           // finish collecting an edge's two vertices
           //
@@ -271,7 +280,8 @@ ReadFileToAdjList (
     } // if-else reading number or non-number
   } // while not the end of file
 
-  *numberVertices = vertexCount;
+  //*numberVertices = vertexCount;
+  *numberVertices = num_max;
   *numberEdges = edgeIndex;
   *V = pv;
   *rV = pv_reverse;
@@ -489,8 +499,8 @@ int main ()
     return -1;
   }
 
-  DEBUG ("1st pass DFS_Loop, #v (9), #e (%d)\n", _numberEdges);
-  DFS_Loop (_rV, 9, _numberEdges); 
+  DEBUG ("1st pass DFS_Loop, #v (%d), #e (%d)\n", _numberVertices, _numberEdges);
+  DFS_Loop (_rV, _numberVertices, _numberEdges); 
   CopyFinishTime ();
   //DFS_Loop ();
 
