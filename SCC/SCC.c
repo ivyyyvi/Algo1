@@ -16,9 +16,8 @@
 #include <limits.h>
 
 #define ASK_FOR_INPUT 0
-//#define DEFAULT_INPUT_FILENAME "sinput0.txt"
-#define DEFAULT_INPUT_FILENAME "sinput1.txt"
-//#define DEFAULT_INPUT_FILENAME "input.txt"
+//#define DEFAULT_INPUT_FILENAME "sinput4.txt"
+#define DEFAULT_INPUT_FILENAME "input.txt"
 
 
 #define _DEBUG
@@ -273,21 +272,13 @@ first (int *wholedeal, int numTotal)
 void
 prepend (int vertex_to_prepend, int *vertices_to_visit, int num_vertices_to_visit)
 {
-  int offset;
-  offset = 1;
+  int offset = 1;
 
   //
   // the index in the bigger address is moved first
   //
   for (int i = num_vertices_to_visit - 1; i >= 0; i--) {
-
-    //
-    // unnecessarily using memcpy. its clearer. so. whatever.
-    //
-    memcpy (
-      &vertices_to_visit[i] + offset, // dest // move to bigger address, offset 
-      &vertices_to_visit[i], // src
-      sizeof (int)); // number of bytes to copy
+    *(vertices_to_visit + i + offset) = *(vertices_to_visit + i);
   }
 
   //
@@ -348,9 +339,6 @@ int DFS_Loop (
   //if (which_pass == 1) {
     vertices_visited = malloc (sizeof (int) * lengthNV);
     memset (vertices_visited, 0, sizeof (int) * lengthNV);
-  //} else if (which_pass == 2) {
-
-  //}
 
   //
   // Traverse the entire graph to call DFS from
@@ -427,7 +415,6 @@ DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
         //
         leader_group[currentLeaderIndex]++;
         if (which_pass == 2) 
-//{DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
   {DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
 
         prepend (currentIndex, vertices_visited, num_vertices_visited);
@@ -463,6 +450,9 @@ DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
             prepend (currentChildIndex, vertices_to_visit, num_vertices_to_visit);
             num_vertices_to_visit++;
             //DEBUG ("  ..And this child is not yet explored. prepended it to vertices_to_visit...\n");
+            if (num_vertices_to_visit == lengthNV) {
+              printf ("vertices_to_visit is not big enough.\n");
+            }
 
 #ifdef _DEBUG
             //printf ("        => vertices_to_visit: [ ");
