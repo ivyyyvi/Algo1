@@ -40,6 +40,7 @@ struct _vertex {
   int degree;
   int Explored;
   int leader;
+  int parent_add_it_to_vertices_to_visit;
   int *connectTo;
 };
 
@@ -309,7 +310,7 @@ first (int *wholedeal, int numTotal)
 }; // removes and returns the first element in the list.
 
 void
-prepend (int node_to_prepend, int *vertices_to_visit, int num_vertices_to_visit)
+prepend (int vertex_to_prepend, int *vertices_to_visit, int num_vertices_to_visit)
 {
   int offset;
   offset = 1;
@@ -331,10 +332,27 @@ prepend (int node_to_prepend, int *vertices_to_visit, int num_vertices_to_visit)
   //
   // prepend (of course) to the start of the stack
   //
-  *vertices_to_visit = node_to_prepend;
+  *vertices_to_visit = vertex_to_prepend;
   return;
 }
 
+void
+takeout (int vertex_to_takeout, int *vertices_visited, int num_vertices_visited)
+{
+  for (int ppp = 0; ppp < num_vertices_visited; ppp++) {
+    if (vertices_visited[ppp] == vertex_to_takeout) {
+      
+      //
+      // move everything after this to one slot smaller place
+      // do it from smaller address
+      //
+      for (int qqq = ppp + 1; qqq < num_vertices_visited; qqq++) {
+        vertices_visited [qqq - 1] = vertices_visited [qqq];
+      }
+      break;
+    }
+  }
+}
 int DFS_Loop (
   vertex *V, // Pointer to the array of vertices to be returned
   int numberVertices, // Pointer to the number of vertices to be returned
@@ -343,12 +361,15 @@ int DFS_Loop (
 {
   int lengthNV;
   int num_vertices_to_visit = 0;
+  int num_vertices_visited = 0;
   int currentLeaderIndex;
   int currentIndex;
+  int takeoutIndex;
   int currentChildIndex;
   vertex *currentVertex;
   vertex *currentChildVertex;
   int *vertices_to_visit; // only keep index of vertices
+  int *vertices_visited;
   int notYetFinish;
   int ttt = 1;
 
@@ -358,6 +379,8 @@ int DFS_Loop (
   lengthNV = 500; // todo, double this size when not enough
   vertices_to_visit = malloc (sizeof (int) * lengthNV);
   memset (vertices_to_visit, 0, sizeof (int) * lengthNV);
+  vertices_visited = malloc (sizeof (int) * lengthNV);
+  memset (vertices_visited, 0, sizeof (int) * lengthNV);
 
   //
   // Traverse the entire graph to call DFS from
@@ -412,15 +435,44 @@ int DFS_Loop (
         currentVertex->Explored = 1; // mark as explored
         currentVertex->leader = currentLeaderIndex; // set leader
 
+        /*
+        //
+        // before prepending,
+        // we should check if currentIndex is added before its parent who add it to vertices_to_visit
+        // if not, take out all that block its way
+        // child need to be before its parent in the vertices_visited stack world. Or it would on a wrong place!
+        //
+        if (vertices_visited[0] != currentVertex->parent_add_it_to_vertices_to_visit) {
+          for (int xxx = 0; xxx < num_vertices_visited; xxx++) {
+            if (vertices_visited[xxx] != currentVertex->parent_add_it_to_vertices_to_visit) {
+              takeout (vertices_visited[xxx], vertices_visited, num_vertices_visited);  
+              num_vertices_visited--;
+            } else {
+              break;
+            }
+          }
+        }*/
+        prepend (currentIndex, vertices_visited, num_vertices_visited);
+        num_vertices_visited++;
+
+#ifdef _DEBUG
+        printf ("        => Trace of visited vertex: { ");
+        for (int ppp = 0; ppp < num_vertices_visited; ppp++) {
+          printf ("%d ", vertices_visited[ppp]);
+        }
+        printf ("}\n");
+#endif
+
         //
         // Traverse children vertices, 
         // if none of the children is unexplored, count the finishing time of the currentVertex
         //
-        //for (int j = 0; j < currentVertex->degree; j++) {
         notYetFinish = 0;
-        for (int j = currentVertex->degree - 1;j >= 0; j--) { // to mimic class note
+        //for (int j = currentVertex->degree - 1;j >= 0; j--) { // to mimic class note
+        for (int j = 0; j < currentVertex->degree; j++) { // different with class note
           currentChildIndex = currentVertex->connectTo[j];
           currentChildVertex = &V[currentChildIndex];
+          currentChildVertex->parent_add_it_to_vertices_to_visit = currentIndex;
           DEBUG ("  (%d)'s child (%d)\n", currentIndex, currentChildIndex);
 
           //
@@ -453,15 +505,89 @@ int DFS_Loop (
         //
 
         if (notYetFinish == 0) {
+          
+          //
+          // Alright, currentVertex finished its job!
+          //
+
+          //
+          // Let's take it out from the visited stack
+          //
+          takeout (currentIndex, vertices_visited, num_vertices_visited);
+          num_vertices_visited--;
+
+          //
+          // before giving awards (finishing time) to currentVertex,
+          // we should check if 
+          //   currentIndex is awarded ...
+          //   ... when it is living before its parent who add it to vertices_to_visit before it was taken out
+          //   i.e. is its parent now sit at the very beginning of the vertices_visited
+          // if not, take out all that block its parent's way, awards the taken out ones first
+          // child need to be before its parent in the vertices_visited stack world. 
+          // Or it would on a wrong place to award them! Its parent needs to see.
+          //
+          DEBUG ("Who is at front seat of vertices_visited when (%d) is awarded finish_time ...?\n", currentIndex);
+          if (vertices_visited[0] != currentVertex->parent_add_it_to_vertices_to_visit) {
+            DEBUG ("Well, not currentVertex's parent (%d) instead it is ..\n", currentVertex->parent_add_it_to_vertices_to_visit);
+            for (int xxx = 0; num_vertices_visited > 0;) { // todo does this work?
+
+              if (vertices_visited[xxx] != currentVertex->parent_add_it_to_vertices_to_visit) {
+
+                //
+                // Remember to award (give finish_time to) them
+                //
+                V[vertices_visited[xxx]].finish_time = ttt;
+                printf ("  -3- here?? finish on f(%d) = (%d) *****\n\n", vertices_visited[xxx], ttt);
+                ttt++;
+
+                //
+                // Take it out of vertices_visited
+                //
+                takeout (vertices_visited[xxx], vertices_visited, num_vertices_visited);  
+                num_vertices_visited--;
+                
+
+              } else {
+                printf ("\n");
+                break;
+              }
+            }
+          }
+
           //
           // Or this? It is time to "giu" back and count finish time!
           //
           currentVertex->finish_time = ttt;
-          printf ("  -- here?? finish on f(%d) = (%d) *****\n", currentIndex, ttt);
+          printf ("  -1- here?? finish on f(%d) = (%d) *****\n\n", currentIndex, ttt);
           ttt++;
+
         }
       } // if current vertex is not yet explored. else {}
     } // while
+
+    //
+    // Finished this one outer for loop, Otsukaresama!
+    // Give rewards to these cute little vertices who haven't got it (still in vertices_visited stack)
+    // by counting their finishing time.
+    // the smaller index in vertices_visited, the shorter its finishing time.
+    //
+    for (int ppp = 0; num_vertices_visited > 0; ppp++) { // todo, can this work?
+
+        takeoutIndex = vertices_visited [0];
+        //
+        // Also take it out from the visited stack
+        //
+        takeout (takeoutIndex, vertices_visited, num_vertices_visited);
+        num_vertices_visited--;
+
+        //
+        // Or this? It is time to "giu" back and count finish time!
+        //
+        V[takeoutIndex].finish_time = ttt;
+        printf ("  -2- here?? finish on f(%d) = (%d) *****\n\n", takeoutIndex, ttt);
+        ttt++;
+
+    } // for loop to give finishing time
   } // for
   return 0;
 } 
