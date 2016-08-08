@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 
 #define ASK_FOR_INPUT 0
 #define DEFAULT_INPUT_FILENAME "sinput3.txt"
@@ -88,9 +89,7 @@ ReadFileToAdjList (
 
   vertex *pv; // array of vertices
   vertex *pv_reverse; // array of vertices
-  edge *pe_reverse; // array of edges
 
-  edge *_pie; // current incidented edge
   vertex *pCurrentVertex; // current vertex
   vertex *pCurrentVertex_reverse; // current vertex
 
@@ -127,13 +126,10 @@ ReadFileToAdjList (
   mmm = 5105043;
   mmm_reverse = mmm;
    
-  pv = malloc (sizeof(vertex) * nnn);
-  memset (pv, 0, sizeof(vertex)* nnn);
+  pv = calloc (nnn, sizeof(vertex));
 
-  pv_reverse = malloc (sizeof(vertex) * nnn);
-  memset (pv_reverse, 0, sizeof(vertex)* nnn);
-  pe_reverse = malloc (sizeof(edge) * mmm_reverse);
-  memset (pe_reverse, 0, sizeof(edge) * mmm_reverse);
+  pv_reverse = calloc (nnn, sizeof(vertex));
+
   // alloc pool for edge incidented on the vertex
   //DEBUG ("IVY: alloc pool for edge incidented on the vertex....\n");
   for (i = 0; i < nnn; i++) {
@@ -489,6 +485,7 @@ DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
             num_vertices_visited--;
 
             //
+            // To compute the correct finish_time
             // before giving awards (finishing time) to currentVertex,
             // we should check if 
             //   currentIndex is awarded ...
@@ -503,7 +500,7 @@ DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
               //DEBUG ("oh yeah. it is its parent! good!\n");
             } else {
               //DEBUG ("Well, not currentVertex's parent (%d) instead it is ..\n", currentVertex->parent_add_it_to_vertices_to_visit);
-              for (int xxx = 0; num_vertices_visited > 0;) { // todo does this work?
+              for (int xxx = 0; num_vertices_visited > 0;) {
 
                 if (vertices_visited[xxx] != currentVertex->parent_add_it_to_vertices_to_visit) {
 
@@ -610,9 +607,13 @@ int main ()
   vertex *_V;
   vertex *_rV;
   int _numberVertices;
-  int *index_sequence_by_finish_time;
+  int *reverse_seq_for_secondpass;
   int *intArray;
   int *largestFiveLeader;
+
+  double time_spent;
+  clock_t end;
+  clock_t begin = clock();
 
   DEBUG ("Start reading girl~\n");
   if (0 != ReadFileToAdjList (
@@ -625,16 +626,16 @@ int main ()
 
   DEBUG ("Calling 1st pass DFS_Loop, #v (%d)\n", _numberVertices);
 
-  index_sequence_by_finish_time = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
+  reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   intArray = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
-  index_sequence_by_finish_time [0] = 0; // this slot is not used
+  reverse_seq_for_secondpass [0] = 0; // this slot is not used
   largestFiveLeader = malloc (sizeof (int) * (_numberVertices + 1));
-  DFS_Loop (1, _rV, _numberVertices, index_sequence_by_finish_time, intArray, largestFiveLeader); 
+  DFS_Loop (1, _rV, _numberVertices, reverse_seq_for_secondpass, intArray, largestFiveLeader); 
   //CopyFinishTime ();
 #ifdef _DEBUG
-  printf ("index_sequence_by_finish_time is: [ ");
+  printf ("reverse_seq_for_secondpass is: [ ");
   for (int i = 1; i <= _numberVertices; i++) {
-    printf ("%d ", index_sequence_by_finish_time [i]);
+    printf ("%d ", reverse_seq_for_secondpass [i]);
   }
   printf ("]\n");
 #endif
@@ -645,8 +646,8 @@ int main ()
   // Processing vertices in decreasing order of finishing times
   //
   memset (largestFiveLeader, 0, sizeof (int) * (_numberVertices + 1));
-  memcpy (intArray, index_sequence_by_finish_time, sizeof (int) * (_numberVertices + 1));
-  DFS_Loop (2, _V, _numberVertices, index_sequence_by_finish_time, intArray, largestFiveLeader); 
+  memcpy (intArray, reverse_seq_for_secondpass, sizeof (int) * (_numberVertices + 1));
+  DFS_Loop (2, _V, _numberVertices, reverse_seq_for_secondpass, intArray, largestFiveLeader); 
  
   qsort(largestFiveLeader, (_numberVertices + 1), sizeof(int), compare_ints);
   printf ("largestFiveLeader is: [ ");
@@ -658,7 +659,10 @@ int main ()
   free (_V);
   free (largestFiveLeader);
   free (intArray);
-  free (index_sequence_by_finish_time);
+  free (reverse_seq_for_secondpass);
+  end = clock();
+  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf ("time spent (%f)\n", time_spent);
  
   return 0;
 }
