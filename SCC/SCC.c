@@ -16,8 +16,8 @@
 #include <limits.h>
 
 #define ASK_FOR_INPUT 0
-//#define DEFAULT_INPUT_FILENAME "sinput4.txt"
-#define DEFAULT_INPUT_FILENAME "input.txt"
+#define DEFAULT_INPUT_FILENAME "sinput3.txt"
+//#define DEFAULT_INPUT_FILENAME "input.txt"
 
 
 #define _DEBUG
@@ -38,7 +38,6 @@ typedef struct _edge edge;
 
 struct _vertex {
   int index;
-  int finish_time;
   int degree;
   int Explored;
   int leader;
@@ -325,9 +324,11 @@ int DFS_Loop (
   vertex *currentVertex;
   vertex *currentChildVertex;
   int *vertices_to_visit; // only keep index of vertices
-  int *vertices_visited;
-  int notYetFinish;
+
   int ttt = 1;
+  int notYetFinish;
+  // only for 1st pass to compute finish_time, in particular, its sequence
+  int *vertices_visited;
 
   //
   // Initialize vertices_to_visit stack
@@ -509,11 +510,10 @@ DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
                   //
                   // Remember to award (give finish_time to) them
                   //
-                  V[vertices_visited[xxx]].finish_time = ttt; //todo, can delete this when having index_sequence_by_finish_time
+                  index_sequence_by_finish_time [ttt] = vertices_visited[xxx]; //index_se... is 1-based
 #ifdef _DEBUG
                   //printf ("  -3- here?? finish on f(%d) = (%d) *****\n\n", vertices_visited[xxx], ttt);
 #endif
-                  index_sequence_by_finish_time [ttt] = vertices_visited[xxx]; //index_se... is 1-based
                   ttt++;
 
                   //
@@ -535,7 +535,6 @@ DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
             //
             // Or this? It is time to "giu" back and count finish time!
             //
-            currentVertex->finish_time = ttt;
             index_sequence_by_finish_time [ttt] = currentIndex; //index_se... is 1-based
 #ifdef _DEBUG
             //printf ("  -1- here?? finish on f(%d) = (%d) *****\n\n", currentIndex, ttt);
@@ -567,7 +566,6 @@ DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
           //
           // Or this? It is time to "giu" back and count finish time!
           //
-          V[takeoutIndex].finish_time = ttt;
           index_sequence_by_finish_time [ttt] = takeoutIndex; //index_se... is 1-based
 #ifdef _DEBUG
           //printf ("  -2- here?? finish on f(%d) = (%d) *****\n\n", takeoutIndex, ttt);
