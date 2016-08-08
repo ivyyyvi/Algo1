@@ -16,7 +16,8 @@
 #include <limits.h>
 
 #define ASK_FOR_INPUT 0
-#define DEFAULT_INPUT_FILENAME "sinput0.txt"
+//#define DEFAULT_INPUT_FILENAME "sinput0.txt"
+#define DEFAULT_INPUT_FILENAME "sinput1.txt"
 
 #define _DEBUG
 
@@ -527,7 +528,9 @@ int DFS_Loop (
           // Or it would on a wrong place to award them! Its parent needs to see.
           //
           DEBUG ("Who is at front seat of vertices_visited when (%d) is awarded finish_time ...?\n", currentIndex);
-          if (vertices_visited[0] != currentVertex->parent_add_it_to_vertices_to_visit) {
+          if (vertices_visited[0] == currentVertex->parent_add_it_to_vertices_to_visit) {
+            DEBUG ("oh yeah. it is its parent! good!\n");
+          } else {
             DEBUG ("Well, not currentVertex's parent (%d) instead it is ..\n", currentVertex->parent_add_it_to_vertices_to_visit);
             for (int xxx = 0; num_vertices_visited > 0;) { // todo does this work?
 
@@ -551,8 +554,8 @@ int DFS_Loop (
                 printf ("\n");
                 break;
               }
-            }
-          }
+            } // for
+          } // if-else
 
           //
           // Or this? It is time to "giu" back and count finish time!
