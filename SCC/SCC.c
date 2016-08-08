@@ -21,7 +21,7 @@
 //#define DEFAULT_INPUT_FILENAME "input.txt"
 
 
-//#define _DEBUG
+#define _DEBUG
 
 #ifdef _DEBUG
 #define DEBUG(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
@@ -65,12 +65,11 @@ int
 ReadFileToAdjList (
   vertex **V, // Pointer to the array of vertices to be returned
   vertex **rV,
-  edge **E, // Pointer to the array of edges to be returned
-  int *numberVertices, // Pointer to the number of vertices to be returned
-  int *numberEdges  // Pointer to the number of edges to be returned
+  int *numberVertices // Pointer to the number of vertices to be returned
   )
 {
   int num;
+  int temp_head;
   int num_max = 0;
   long int mmm; // max number of edges just for alloc
   long int mmm_reverse; // max number of edges just for alloc
@@ -87,12 +86,9 @@ ReadFileToAdjList (
 
   int i;
   int vertexCount;
-  int edgeIndex;
-  int edgeIndex_reverse;
   int edgePool;
 
   vertex *pv; // array of vertices
-  edge *pe; // array of edges
   vertex *pv_reverse; // array of vertices
   edge *pe_reverse; // array of edges
 
@@ -132,13 +128,9 @@ ReadFileToAdjList (
 
   mmm = 5105043;
   mmm_reverse = mmm;
-  edgeIndex = 0;
-  edgeIndex_reverse = 0;
    
   pv = malloc (sizeof(vertex) * nnn);
   memset (pv, 0, sizeof(vertex)* nnn);
-  pe = malloc (sizeof(edge) * mmm);
-  memset (pe, 0, sizeof(edge) * mmm);
 
   pv_reverse = malloc (sizeof(vertex) * nnn);
   memset (pv_reverse, 0, sizeof(vertex)* nnn);
@@ -206,20 +198,8 @@ ReadFileToAdjList (
           pCurrentVertex = &pv [num];
           pCurrentVertex->index = num;
 
-          //
-          // if edge pool not big enough, double it
-          //
-          if (edgeIndex_reverse > mmm_reverse) {
-            //DEBUG ("-------edge pool not enough! (%ld)\n", mmm);
-            mmm_reverse *= 2;
-            free (pe_reverse);
-            pe_reverse = malloc (sizeof(edge) * mmm_reverse);
-            memset (pe_reverse, 0, sizeof(edge) * mmm_reverse);
-          }
           // for reverse G, the num collected here is the end (head) of vertex of an edge
-          pe_reverse[edgeIndex_reverse].v = num;
-
-          
+          temp_head = num;
         } else { 
           edgeStart = 1;
 
@@ -255,28 +235,8 @@ ReadFileToAdjList (
           pCurrentVertex_reverse = &pv_reverse [num];
           pCurrentVertex_reverse->index = num;
           // already knew the end (head) of the edge, now fill it in.
-          pCurrentVertex_reverse->connectTo [pCurrentVertex_reverse->degree] = pe_reverse[edgeIndex_reverse].v;
-          pe_reverse[edgeIndex_reverse].u = num;
-          //DEBUG ("  (%d)th reverse edge = (%d, %d)\n", edgeIndex_reverse, pe_reverse[edgeIndex_reverse].u, pe_reverse[edgeIndex_reverse].v);
-          edgeIndex_reverse++;
+          pCurrentVertex_reverse->connectTo [pCurrentVertex_reverse->degree] = temp_head;
           pCurrentVertex_reverse->degree++;
-          
-
-          //
-          // if edge pool not big enough, double it
-          //
-          if (edgeIndex > mmm) {
-            //DEBUG ("-------edge pool not enough! (%ld)\n", mmm);
-            mmm *= 2;
-            free (pe);
-            pe = malloc (sizeof(edge) * mmm);
-            memset (pe, 0, sizeof(edge) * mmm);
-          }
-
-          pe[edgeIndex].u = pCurrentVertex->index;
-          pe[edgeIndex].v = num;
-          //DEBUG ("  (%d)th edge = (%d, %d)\n", edgeIndex, pe[edgeIndex].u, pe[edgeIndex].v);
-          edgeIndex++;
         } // whether or not the num is collected after a new line
 
         num = 0;
@@ -286,10 +246,8 @@ ReadFileToAdjList (
 
   //*numberVertices = vertexCount;
   *numberVertices = num_max;
-  *numberEdges = edgeIndex;
   *V = pv;
   *rV = pv_reverse;
-  *E = pe;
   
   fclose (fp);
   return 0;
@@ -408,7 +366,7 @@ int DFS_Loop (
         break;
       case 2:
         currentOuterForLoopVertexIndex = index_sequence_by_finish_time_2[sss];
-      DEBUG ("This is 2nd pass.%d th vertices is (%d)\n", sss, currentOuterForLoopVertexIndex);
+      //DEBUG ("This is 2nd pass.%d th vertices is (%d)\n", sss, currentOuterForLoopVertexIndex);
         break;
       default:
         break;
@@ -418,7 +376,7 @@ int DFS_Loop (
     // if the vertex is already explored, go to the next vertex
     //
     if (V[currentOuterForLoopVertexIndex].Explored) {
-      DEBUG ("V[%d] is already explored\n", currentOuterForLoopVertexIndex);
+      //DEBUG ("V[%d] is already explored\n", currentOuterForLoopVertexIndex);
       continue;
     }
 
@@ -458,7 +416,7 @@ int DFS_Loop (
       //
       if (currentVertex->Explored == 0) {
 
-DEBUG ("Explore (%d)\n", currentIndex);
+DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
         //DEBUG ("..And this vertex not yet explored. I mean (%d) who got degree (%d)\n", currentIndex, currentVertex->degree);
         currentVertex->Explored = 1; // mark as explored
 
@@ -470,7 +428,7 @@ DEBUG ("Explore (%d)\n", currentIndex);
         leader_group[currentLeaderIndex]++;
         if (which_pass == 2) 
 //{DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
-{DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
+  {DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
 
         prepend (currentIndex, vertices_visited, num_vertices_visited);
         num_vertices_visited++;
@@ -629,6 +587,7 @@ DEBUG ("Explore (%d)\n", currentIndex);
       } // for loop to give finishing time
     //} // if 1st pass
   } // for
+  free (vertices_visited);
   return 0;
 } 
 
@@ -662,27 +621,21 @@ int main ()
   char file_name[100] = DEFAULT_INPUT_FILENAME;
   vertex *_V;
   vertex *_rV;
-  edge *_E;
   int _numberVertices;
-  int _numberEdges;
   int *index_sequence_by_finish_time;
   int *intArray;
   int *largestFiveLeader;
-  //graph G;
-  //DEBUG ("char array content: %s\n", DEFAULT_INPUT_FILENAME);
-  //DEBUG ("char array file_name size (%ld)\n", sizeof(file_name));
 
+  DEBUG ("Start reading girl~\n");
   if (0 != ReadFileToAdjList (
              &_V,
              &_rV,
-             &_E,
-             &_numberVertices,
-             &_numberEdges
+             &_numberVertices
              )) {
     return -1;
   }
 
-  DEBUG ("1st pass DFS_Loop, #v (%d), #e (%d)\n", _numberVertices, _numberEdges);
+  DEBUG ("Calling 1st pass DFS_Loop, #v (%d)\n", _numberVertices);
 
   index_sequence_by_finish_time = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   intArray = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
@@ -699,12 +652,10 @@ int main ()
 #endif
 
   free (_rV);
-  free (_E);
   
   //
   // Processing vertices in decreasing order of finishing times
   //
-  //DFS_Loop (2, _rV, _numberVertices, _numberEdges); 
   memset (largestFiveLeader, 0, sizeof (int) * (_numberVertices + 1));
   memcpy (intArray, index_sequence_by_finish_time, sizeof (int) * (_numberVertices + 1));
   DFS_Loop (2, _V, _numberVertices, index_sequence_by_finish_time, intArray, largestFiveLeader); 
@@ -715,6 +666,11 @@ int main ()
     printf ("%d ", largestFiveLeader[_numberVertices - i]);
   }
   printf ("]\n");
+
+  free (_V);
+  free (largestFiveLeader);
+  free (intArray);
+  free (index_sequence_by_finish_time);
  
   return 0;
 }
