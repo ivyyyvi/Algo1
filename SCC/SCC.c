@@ -16,12 +16,12 @@
 #include <limits.h>
 
 #define ASK_FOR_INPUT 0
-#define DEFAULT_INPUT_FILENAME "sinput0.txt"
-//#define DEFAULT_INPUT_FILENAME "sinput1.txt"
+//#define DEFAULT_INPUT_FILENAME "sinput0.txt"
+#define DEFAULT_INPUT_FILENAME "sinput1.txt"
 //#define DEFAULT_INPUT_FILENAME "input.txt"
 
 
-#define _DEBUG
+//#define _DEBUG
 
 #ifdef _DEBUG
 #define DEBUG(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
@@ -361,6 +361,7 @@ int DFS_Loop (
   vertex *V, // Pointer to the array of vertices to be returned
   int numberVertices, // Pointer to the number of vertices to be returned
   int *index_sequence_by_finish_time,
+  int *index_sequence_by_finish_time_2,
   int *leader_group //int *largestFiveLeader
   )
 {
@@ -397,16 +398,17 @@ int DFS_Loop (
   // Traverse the entire graph to call DFS from
   // Note that 1st pass and 2nd pass DFS_Loop is using different sequence
   // 1st pass uses decresing order of vertex.index
-  // 2nd pass uses decresing order of vertex index stored in index_sequence_by_finish_time
+  // 2nd pass uses decresing order of vertex index stored in index_sequence_by_finish_time_2
   //
-  for (int i = numberVertices; i > 0; i--) {
+  for (int sss = numberVertices; sss > 0; sss--) {
 
     switch (which_pass) {
       case 1:
-        currentOuterForLoopVertexIndex = i;
+        currentOuterForLoopVertexIndex = sss;
         break;
       case 2:
-        currentOuterForLoopVertexIndex = index_sequence_by_finish_time[i];
+        currentOuterForLoopVertexIndex = index_sequence_by_finish_time_2[sss];
+      DEBUG ("This is 2nd pass.%d th vertices is (%d)\n", sss, currentOuterForLoopVertexIndex);
         break;
       default:
         break;
@@ -423,7 +425,7 @@ int DFS_Loop (
     //
     // if the vertex is not yet explored, mark it as explored
     //
-    DEBUG ("V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
+    //DEBUG ("V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
   
     //
     // init vertices_to_visit with (index of) root
@@ -436,7 +438,7 @@ int DFS_Loop (
     //
     currentLeaderIndex = currentOuterForLoopVertexIndex;
 
-    DEBUG ("Outer for loop @ %d (leader)\n", currentOuterForLoopVertexIndex);
+    //DEBUG ("Outer for loop @ %d (leader)\n", currentOuterForLoopVertexIndex);
     //
     // while the vertices_to_visit is not empty
     //
@@ -456,58 +458,20 @@ int DFS_Loop (
       //
       if (currentVertex->Explored == 0) {
 
+DEBUG ("Explore (%d)\n", currentIndex);
         //DEBUG ("..And this vertex not yet explored. I mean (%d) who got degree (%d)\n", currentIndex, currentVertex->degree);
         currentVertex->Explored = 1; // mark as explored
 
-        //if (which_pass == 2) {
-          currentVertex->leader = currentLeaderIndex; // set leader
-          
-          //
-          // leader group
-          //
-          leader_group[currentLeaderIndex]++;
-          if (which_pass == 2) 
+        currentVertex->leader = currentLeaderIndex; // set leader
+        
+        //
+        // leader group
+        //
+        leader_group[currentLeaderIndex]++;
+        if (which_pass == 2) 
+//{DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
 {DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
 
-          /*//
-          // Record only the largest 5 size of leader group
-          //
-          for (int ggg= 0; ggg < 5; ggg++) {
-            if (leader_group[currentLeaderIndex] >= largestFiveLeader[ggg]) {
-
-              //
-              // move one slot later
-              //
-              for (int hhh = 3; hhh >= 0; hhh--) {
-                largestFiveLeader [hhh + 1] = largestFiveLeader [hhh];
-              }
-
-              //
-              // And then add current large leader_group at the space just given away
-              //
-              largestFiveLeader [0] = leader_group [currentLeaderIndex];
-            }
-          }
-          */
-        //}
-
-        /*
-        //
-        // before prepending,
-        // we should check if currentIndex is added before its parent who add it to vertices_to_visit
-        // if not, take out all that block its way
-        // child need to be before its parent in the vertices_visited stack world. Or it would on a wrong place!
-        //
-        if (vertices_visited[0] != currentVertex->parent_add_it_to_vertices_to_visit) {
-          for (int xxx = 0; xxx < num_vertices_visited; xxx++) {
-            if (vertices_visited[xxx] != currentVertex->parent_add_it_to_vertices_to_visit) {
-              takeout (vertices_visited[xxx], vertices_visited, num_vertices_visited);  
-              num_vertices_visited--;
-            } else {
-              break;
-            }
-          }
-        }*/
         prepend (currentIndex, vertices_visited, num_vertices_visited);
         num_vertices_visited++;
 
@@ -702,8 +666,8 @@ int main ()
   int _numberVertices;
   int _numberEdges;
   int *index_sequence_by_finish_time;
+  int *intArray;
   int *largestFiveLeader;
-  int *largestFiveLeader_output;
   //graph G;
   //DEBUG ("char array content: %s\n", DEFAULT_INPUT_FILENAME);
   //DEBUG ("char array file_name size (%ld)\n", sizeof(file_name));
@@ -721,10 +685,10 @@ int main ()
   DEBUG ("1st pass DFS_Loop, #v (%d), #e (%d)\n", _numberVertices, _numberEdges);
 
   index_sequence_by_finish_time = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
+  intArray = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   index_sequence_by_finish_time [0] = 0; // this slot is not used
   largestFiveLeader = malloc (sizeof (int) * (_numberVertices + 1));
-  largestFiveLeader_output = malloc (sizeof (int) * (_numberVertices + 1));
-  DFS_Loop (1, _rV, _numberVertices, index_sequence_by_finish_time, largestFiveLeader); 
+  DFS_Loop (1, _rV, _numberVertices, index_sequence_by_finish_time, intArray, largestFiveLeader); 
   //CopyFinishTime ();
 #ifdef _DEBUG
   printf ("index_sequence_by_finish_time is: [ ");
@@ -742,17 +706,9 @@ int main ()
   //
   //DFS_Loop (2, _rV, _numberVertices, _numberEdges); 
   memset (largestFiveLeader, 0, sizeof (int) * (_numberVertices + 1));
-  DFS_Loop (2, _V, _numberVertices, index_sequence_by_finish_time, largestFiveLeader); 
+  memcpy (intArray, index_sequence_by_finish_time, sizeof (int) * (_numberVertices + 1));
+  DFS_Loop (2, _V, _numberVertices, index_sequence_by_finish_time, intArray, largestFiveLeader); 
  
-    //int ints[] = { -2, 99, 0, -743, 2, INT_MIN, 4 };
-    //int size = sizeof ints / sizeof *ints;
- 
-    //qsort(ints, size, sizeof(int), compare_ints);
-  printf ("largestFiveLeader is: [ ");
-  for (int i = 0; i < 5; i++) {
-    printf ("%d ", largestFiveLeader[i]);
-  }
-  printf ("]\n");
   qsort(largestFiveLeader, (_numberVertices + 1), sizeof(int), compare_ints);
   printf ("largestFiveLeader is: [ ");
   for (int i = 0; i < 5; i++) {
