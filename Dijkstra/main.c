@@ -1,22 +1,46 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define ASCII_CODE_TAB 0x09
+#define ASCII_CODE_SPACE 0x20
+#define ASCII_CODE_COMMA 0x2C
+#define ASCII_CODE_NEWLINE 0x0A
+#define ASCII_CODE_CARRIAGE_RETURN 0x0D
+
+#define _DEBUG
+
+#ifdef _DEBUG
+#define DEBUG(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
+#else
+#define DEBUG(args...)
+#endif
+
 typedef struct _edge edge;
 
 struct _edge {
   char Explored;
   int tailIndex; // start
   int headIndex; // end
+  int weight; // length
 };
 
+enum readingFlag {
+  isAfterNewLineCR = 1,
+  isAfterComma = 2,
+  isAfterSpace = 3
+};
 
 void
-ReadInput (edge *E, int *numEdge)
+ReadInput (edge *E, int *numEdge, int *numVertices)
 {
   char ch;
-  char collect;
-  int num;
-  int edgeCount = 0;
+  char collectFlag;
+  enum readingFlag flag;
+  int currentReadNum;
+  int vertexIndexMax = 0;
+  int verticesCount = 0;
+  int edgesCount = 0;
+  edge* currentEdge = NULL;
 
   char currentChar;
   FILE *f = fopen("data.txt", "rb");
@@ -29,140 +53,156 @@ ReadInput (edge *E, int *numEdge)
   fclose(f);
 
   ch = 0;
-  num = 0;
+  currentReadNum = 0;
 
-  printf ("Start processing bytes\n");
+  DEBUG ("Start processing bytes\n");
 
+  flag = isAfterNewLineCR;
   for (int tracker = 0; tracker < pos; tracker++) {
-    printf ("0x%x = %c \n",bytes[tracker], bytes[tracker]);
+    //DEBUG ("0x%x = %c \n",bytes[tracker], bytes[tracker]);
 
     currentChar = bytes[tracker];
-    
+
     //
-    // If get a number, collect it in num.
+    // If get a number, collectFlag it in currentReadNum.
     //
     if (currentChar >= 0x30 && currentChar <= 0x39) {
       //DEBUG ("_%d_ \n", (currentChar - 0x30));
-      num = num * 10 + (currentChar - 0x30);
-      collect = 1;
+      currentReadNum = currentReadNum * 10 + (currentChar - 0x30);
+      collectFlag = 1;
     } else {
 
       //
-      // If array is running out of space,
-      // double it before putting anything in it.
+      // The character reading here is not a number.
+      // so first see what we have collected
       //
-      if (vertexCount >= nnn) {
+      if (collectFlag == 1) {
 
         //
-        // If array size is not enough, double the array size.
+        // if a number has been collected.
         //
-        //DEBUG ("-------vertice pool not enough! (%d)\n", degreeMax);
-        nnn *= 2;
-        free (pv);
-        pv = malloc (sizeof (vertex) * nnn);
-        free (pv_reverse);
-        pv_reverse = malloc (sizeof (vertex) * nnn);
-      } // if vertex array is not big enough
+        collectFlag = 0;
 
-      if (collect == 1) { // if a number is read
-        collect = 0;
-        
-        //
-        // use max of num saw to be the vertices number
-        // this assumes vertices index are continual no skipping
-        //
-        if (num > num_max) {
-          num_max = num;
-        }
+        switch (flag) {
+          case isAfterNewLineCR:
 
-        if (edgeStart) {
-          edgeStart = 0;
+            //
+            // Before collecting this number, there was immedately a newline/CR
+            //
 
-          // the num collected here is the start (tail) index of vertex of an edge
-          pCurrentVertex = &pv [num];
-          pCurrentVertex->index = num;
-
-          // for reverse G, the num collected here is the end (head) of vertex of an edge
-          temp_head = num;
-        } else { 
-          edgeStart = 1;
-
-          //
-          // finish collecting an edge's two vertices
-          //
-
-          //
-          // if degreeMax not big enough, double it
-          //
-          if (pCurrentVertex->degree >= degreeMax) {
-            //DEBUG ("-------degreeMax (%d) not enough!\n", degreeMax);
-            degreeMax *= 2;
-            for (i = 0; i < nnn; i++) {
-              free ((pv + i)->connectTo);
-              (pv + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-              memset ((pv + i)->connectTo, 0, sizeof(int)*(degreeMax));
-              free ((pv_reverse + i)->connectTo);
-              (pv_reverse + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-              memset ((pv_reverse + i)->connectTo, 0, sizeof(int)*(degreeMax));
+            //
+            // use max of num saw at the beginnging of lines
+            // to be the vertices count
+            // this assumes the leading number of the lines are always (tail) vertex index
+            //
+            if (currentReadNum > vertexIndexMax) {
+              vertexIndexMax = currentReadNum;
             }
-          } // if degree Max not big enough // todo, what about the reverse
+            verticesCount++;//1-base
+            //DEBUG ("verticesCount++ to (%d)\n", verticesCount);
+            currentEdge = &E[verticesCount];
+            if (currentEdge) {
+              //DEBUG ("1 Read (%d) as tailIndex\n", currentReadNum);
+              currentEdge->tailIndex = currentReadNum;
+            }
+            break;
+          case isAfterComma:
+            if (currentEdge) {
+              //DEBUG ("3 Read (%d) as weight\n", currentReadNum);
+              currentEdge->weight = currentReadNum;
+              edgesCount++;
+              //DEBUG ("-----So this is %dth edge = (%d, %d; %d)\n", edgesCount, currentEdge->tailIndex, currentEdge->headIndex, currentEdge->weight);
+            }
+            break;
+          case isAfterSpace:
+          default:
+            if (currentEdge) {
+              //DEBUG ("2 Read (%d) as headIndex\n", currentReadNum);
+              currentEdge->headIndex = currentReadNum;
+            }
+            break;
+        } // switch flag to deal with number just collected
 
-          //
-          // the num here collected is the end (head) of an edge
-          //
-          pCurrentVertex->connectTo [pCurrentVertex->degree] = num;//0-base
-          pCurrentVertex->degree++;
+        currentReadNum = 0;
+        flag = 0;
 
-          //
-          // for reverse G, the num collected is the start (tail) of an edge
-          //
-          pCurrentVertex_reverse = &pv_reverse [num];
-          pCurrentVertex_reverse->index = num;
-          // already knew the end (head) of the edge, now fill it in.
-          pCurrentVertex_reverse->connectTo [pCurrentVertex_reverse->degree] = temp_head;
-          pCurrentVertex_reverse->degree++;
-        } // whether or not the num is collected after a new line
+        switch (currentChar) {
 
-        num = 0;
-      } // if finish collect a number from reading the file
+          case ASCII_CODE_CARRIAGE_RETURN:
+          case ASCII_CODE_NEWLINE:
+            //DEBUG ("The next number is leading number of a line => (tail) vertex index\n");
+            flag = isAfterNewLineCR;
+            break;
+
+          case ASCII_CODE_COMMA:
+            //DEBUG ("The next number is the number after comma => weight\n");
+            flag = isAfterComma;
+            break;
+
+          case ASCII_CODE_SPACE:
+          case ASCII_CODE_TAB:
+          default:
+            //DEBUG ("The next number is (head) vertex index\n");
+            flag = isAfterSpace;
+            break;
+
+        } // switch case to deal with number collected after this non-numeric char
+
+      } // if collectFlag is 1
+
     } // if-else reading number or non-number
-  }
+  } // for loop traverse bytes
 
-  printf ("End printing bytes\n");
+  DEBUG ("End processing bytes\n");
   free(bytes); // free allocated memory
 
-}
+  *numEdge = edgesCount;
+  *numVertices = vertexIndexMax;
+} // ReadInput
 
 void
 Dijkstra (int *A, int num_nodes, edge* E, int num_edges)
 {
-
+  int sourceVertex = 1;
+  A[sourceVertex] = 0;
 }
 
 int main ()
 {
+  int totalVertices; // number of nodes
+  int totalEdges;
+  int totalVertices_for_alloc = totalVertices + 1; // because A is 1-base
+  int *_A; // computed shortest path distances for each vertex; 1-base
+  edge *_E, *_E_exact;
 
-  int nnn = 200; // number of nodes
-  int mmm;
-  int nnn_for_alloc = nnn + 1; // because A is 1-base 
-  int *_A;
-  edge *_E;
+  totalVertices = 200; // just estimate first
+  totalEdges = totalVertices * (totalVertices - 1); // just estimate first
 
-  _A = calloc (nnn_for_alloc, sizeof (int));
-  mmm = nnn * (nnn - 1);
+  _E = calloc (totalEdges, sizeof (edge));
 
-  _E = calloc (mmm, sizeof (edge));
+  ReadInput (_E, &totalEdges, &totalVertices);
+  DEBUG ("m = %d, n = %d\n", totalEdges, totalVertices);
 
-  ReadInput (_E, &mmm);
-  Dijkstra (_A, nnn, _E, mmm);
+  //
+  // Now alloc with exact size needed.
+  //
+  _E_exact = realloc (_E, totalEdges * sizeof (edge));
+  //DEBUG ("after realloc _E (%p)\n", _E);
+  totalVertices_for_alloc = totalVertices + 1;
+  _A = calloc (totalVertices_for_alloc, sizeof (int));
+  //DEBUG ("after realloc _A (%p)\n", _A);
+
+  Dijkstra (_A, totalVertices, _E_exact, totalEdges);
 
 
   /*
-  for (int i = 0; i < nnn_for_alloc; i++) {
-    printf ("A[%d] = %d\n", i, _A[i]);
+  for (int i = 0; i < totalVertices_for_alloc; i++) {
+    DEBUG ("A[%d] = %d\n", i, _A[i]);
   }
   */
   free (_A);
-  free (_E);
+  //DEBUG ("after freed _A\n");
+  free (_E_exact);
+  //DEBUG ("after freed _E_exact\n");
   return 0;
 }
