@@ -7,8 +7,6 @@
 //  Copyright (c) 2016 ___IVYCANT___. All rights reserved.
 //
 
-//todo how to get correct finishing time?
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,8 +15,8 @@
 #include <time.h>
 
 #define ASK_FOR_INPUT 0
-//#define DEFAULT_INPUT_FILENAME "sinput3.txt"
-#define DEFAULT_INPUT_FILENAME "input.txt"
+#define DEFAULT_INPUT_FILENAME "sinput3.txt"
+//#define DEFAULT_INPUT_FILENAME "input.txt"
 
 
 #define _DEBUG
@@ -248,6 +246,19 @@ ReadFileToAdjList (
 }
 
 int
+PopEnd (int *wholedeal, int numTotal)
+{
+  int vertex_to_pop;
+  vertex_to_pop = wholedeal[numTotal - 1];
+  wholedeal[numTotal] = 0;
+
+  // remove
+
+  return vertex_to_pop;
+}; // removes and returns the end element in the list.
+
+
+int
 first (int *wholedeal, int numTotal)
 {
   int vertex_first;
@@ -263,6 +274,16 @@ first (int *wholedeal, int numTotal)
 
   return vertex_first;
 }; // removes and returns the first element in the list.
+
+void
+append (int vertex_to_append, int *vertices_to_visit, int num_vertices_to_visit)
+{
+  //
+  // append (of course) to the end of the stack
+  //
+  vertices_to_visit[num_vertices_to_visit] = vertex_to_append;
+  return;
+}
 
 void
 prepend (int vertex_to_prepend, int *vertices_to_visit, int num_vertices_to_visit)
@@ -391,7 +412,7 @@ int DFS_Loop (
       // pop a vertex from the vertices_to_visit stack;
       // and delete the vertex from the vertices_to_visit stack // todo, check if this step should be here
       //
-      currentIndex = first (vertices_to_visit, num_vertices_to_visit);
+      currentIndex = PopEnd (vertices_to_visit, num_vertices_to_visit);
       currentVertex = &V[currentIndex];
       num_vertices_to_visit--;
       //DEBUG ("Pop (%d) from stack\n", currentIndex);
@@ -420,9 +441,9 @@ int DFS_Loop (
         //if (true) {// ##forPass2
           if (num_vertices_to_visit == len_max_vertices_visited) {
             len_max_vertices_visited *= 2;
-            realloc (vertices_visited, len_max_vertices_visited);
+            vertices_visited = realloc (vertices_visited, len_max_vertices_visited);
           }
-          prepend (currentIndex, vertices_visited, num_vertices_visited);
+          append (currentIndex, vertices_visited, num_vertices_visited);
           num_vertices_visited++;
         //}
 
@@ -447,15 +468,15 @@ int DFS_Loop (
           //DEBUG ("  (%d)'s child (%d)\n", currentIndex, currentChildIndex);
 
           //
-          // if the child vertex is not yet explored, prepend it to vertices_to_visit.
+          // if the child vertex is not yet explored, append it to vertices_to_visit.
           // todo, should I mark as explored here?
           // I think NO. It is when its child vertice are about to be explored, when it is marked explored.
           //
           if (currentChildVertex->Explored == 0) {
             notYetFinish = 1; // having child that is not yet explored means this vertex is not finished exploring
-            prepend (currentChildIndex, vertices_to_visit, num_vertices_to_visit);
+            append (currentChildIndex, vertices_to_visit, num_vertices_to_visit);
             num_vertices_to_visit++;
-            //DEBUG ("  ..And this child is not yet explored. prepended it to vertices_to_visit...\n");
+            //DEBUG ("  ..And this child is not yet explored. appended it to vertices_to_visit...\n");
             if (num_vertices_to_visit == len_max_vertices_to_visit) {
               printf ("vertices_to_visit size (%d) is not big enough.\n", len_max_vertices_to_visit);
               len_max_vertices_to_visit *= 2;
