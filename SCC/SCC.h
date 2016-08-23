@@ -9,10 +9,13 @@ extern int nnn;
 
 
 #define ASK_FOR_INPUT 0
-#define DEFAULT_INPUT_FILENAME "sinput3.txt"
+//#define DEFAULT_INPUT_FILENAME "sinput3.txt"
 //#define DEFAULT_INPUT_FILENAME "input.txt"
 //#define DEFAULT_INPUT_FILENAME "HalfInput.txt"
 
+#ifdef DEFAULT_INPUT_FILENAME_A
+  #define DEFAULT_INPUT_FILENAME "testInput002.txt"
+#endif
 
 #define _DEBUG
 
