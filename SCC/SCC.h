@@ -14,7 +14,23 @@ extern int nnn;
 //#define DEFAULT_INPUT_FILENAME "HalfInput.txt"
 
 #ifdef DEFAULT_INPUT_FILENAME_A
-  #define DEFAULT_INPUT_FILENAME "testInput002.txt"
+  #define DEFAULT_INPUT_FILENAME "testInput003.txt"
+#endif
+
+//#define _DEBUG_PROCESS_INPUT
+
+#ifdef _DEBUG_PROCESS_INPUT
+#define DEBUG_PROCESS_INPUT(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
+#else
+#define DEBUG_PROCESS_INPUT(args...)
+#endif
+
+#define _DEBUG_DFS
+
+#ifdef _DEBUG_DFS
+#define DEBUG_DFS(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
+#else
+#define DEBUG_DFS(args...)
 #endif
 
 #define _DEBUG

@@ -37,15 +37,15 @@ ReadFileToAdjList (
 #if ASK_FOR_INPUT
   // get file name from user input
   memset (file_name, 0, sizeof(file_name));//todo
-  DEBUG ("Type File name:");
+  DEBUG_PROCESS_INPUT ("Type File name:");
   fgets (file_name, 100, stdin);
 
   tracker = file_name;
 
   while (*tracker) {
-    //DEBUG ("*file_name is  (0x%x)\n", *tracker);
+    //DEBUG_PROCESS_INPUT ("*file_name is  (0x%x)\n", *tracker);
     if (*tracker == 0xA || *tracker == 0xD) {
-      //DEBUG ("found new line (0x%x)\n", *tracker);
+      //DEBUG_PROCESS_INPUT ("found new line (0x%x)\n", *tracker);
       *tracker = 0;
       break;
     }
@@ -56,7 +56,7 @@ ReadFileToAdjList (
   fp = fopen (file_name, "r");  // read mode
 
   if (fp == NULL) {
-    //DEBUG ("Error while opening the file.\n");
+    DEBUG_PROCESS_INPUT ("Error while opening the file.\n");
     return -1;
   }
 
@@ -79,7 +79,6 @@ ReadFileToAdjList (
   pv_reverse = calloc (nnn, sizeof(vertex));
 
   // alloc pool for edge incidented on the vertex
-  //DEBUG ("IVY: alloc pool for edge incidented on the vertex....\n");
   for (int i = 0; i < nnn; i++) {
     (pv + i)->connectTo = malloc (sizeof (int)*(degreeMax));
     memset ((pv + i)->connectTo, 0, sizeof(int)*(degreeMax));
@@ -101,7 +100,6 @@ ReadFileToAdjList (
     // If get a number, collect it in num.
     //
     if (ch >= 0x30 && ch <= 0x39) {
-      //DEBUG ("_%d_ \n", (ch - 0x30));
       num = num * 10 + (ch - 0x30);
       collect = 1;
     } else {
@@ -115,7 +113,7 @@ ReadFileToAdjList (
         //
         // If array size is not enough, double the array size.
         //
-        //DEBUG ("-------vertice pool not enough! (%d)\n", degreeMax);
+        DEBUG_PROCESS_INPUT ("-------vertice pool not enough! (%d)\n", degreeMax);
         nnn *= 2;
         free (pv);
         pv = malloc (sizeof (vertex) * nnn);
@@ -154,7 +152,7 @@ ReadFileToAdjList (
           // if degreeMax not big enough, double it
           //
           if (pCurrentVertex->degree >= degreeMax) {
-            //DEBUG ("-------degreeMax (%d) not enough!\n", degreeMax);
+            DEBUG_PROCESS_INPUT ("-------degreeMax (%d) not enough!\n", degreeMax);
             degreeMax *= 2;
             for (int i = 0; i < nnn; i++) {
               free ((pv + i)->connectTo);
@@ -171,6 +169,7 @@ ReadFileToAdjList (
           //
           pCurrentVertex->connectTo [pCurrentVertex->degree] = num;//0-base
           pCurrentVertex->degree++;
+          DEBUG_PROCESS_INPUT ("Collected Edge (%d, %d)\n", pCurrentVertex->index, pCurrentVertex->connectTo [pCurrentVertex->degree - 1]);
 
           //
           // for reverse G, the num collected is the start (tail) of an edge

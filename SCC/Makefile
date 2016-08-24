@@ -6,7 +6,7 @@ ifeq ($(DEBUG), y)
 	CFLAGS = -g -DSINGLESETTEST
 	CFLAGS = -g -DPIVOTTEST
 else
- 	CFLAGS = -g 
+ 	CFLAGS = -g
 endif
 
 INPUT = a
@@ -23,14 +23,15 @@ CFLAGS += -I.
 #%.o: %.c $(DEPS)
 	#$(CC) -c -o $@ $< $(CFLAGS)
 
-SCC_simple:
-	gcc -o SCC SCC.c ProcessInput.c # build everything evertime
-
-SCC: ProcessInput.o SCC.o 
-	gcc -o SCC SCC.o ProcessInput.o $(CFLAGS)
-
-SCC_advanced: $(OBJ)
+SCC: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
+
+#SCC: ProcessInput.o SCC.o
+	#gcc -o SCC SCC.o ProcessInput.o $(CFLAGS)
+
+#SCC_simple:
+	#gcc -o SCC SCC.c ProcessInput.c # build everything evertime
+
 clean:
 	rm SCC *.o
 
