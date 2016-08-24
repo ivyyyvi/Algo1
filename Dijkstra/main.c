@@ -176,6 +176,17 @@ Dijkstra (int *A, int num_nodes, edge* E, int num_edges)
   // pick the one that minimizes A[v] + l(v,w)
   //
 
+  //
+  // Naively scan through all the edges
+  //
+
+  //
+  // add w* to X
+  //
+
+  //
+  // set A[w*] = A[v*] + l(v*, w*)
+  //
 }
 
 int main ()
