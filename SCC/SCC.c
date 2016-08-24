@@ -7,245 +7,9 @@
 //  Copyright (c) 2016 ___IVYCANT___. All rights reserved.
 //
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#include <time.h>
-
-#define ASK_FOR_INPUT 0
-//#define DEFAULT_INPUT_FILENAME "sinput0.txt"
-//#define DEFAULT_INPUT_FILENAME "input.txt"
-#define DEFAULT_INPUT_FILENAME "testInput001.txt"
-
-
-#define _DEBUG
-
-#ifdef _DEBUG
-#define DEBUG(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
-#else
-#define DEBUG(args...)
-#endif
+#include "SCC.h"
 
 int nnn = 875715; // max number of vertices just for alloc // this can be doubled if not enough
-
-typedef struct _vertex vertex;
-typedef struct _edge edge;
-//typedef struct _graph graph;
-//typedef struct _listClass listClass;
-//typedef struct _stackClass stackClass;
-
-struct _vertex {
-  int index;
-  int degree;
-  int Explored;
-  int leader;
-  int parent_add_it_to_vertices_to_visit;
-  int *connectTo;
-};
-
-struct _edge {
-  int u; // vertex index 1st endpoint
-  int v; // vertex index 2nd endpoint
-};
-
-struct _graph {
-  vertex *V;
-};
-
-/*struct _listClass {
-  vertex* vertex_list;
-  vertex* (*first) (listClass *list);
-};*/
-
-int
-ReadFileToAdjList (
-  vertex **V, // Pointer to the array of vertices to be returned
-  vertex **rV,
-  int *numberVertices // Pointer to the number of vertices to be returned
-  )
-{
-  int num;
-  int temp_head;
-  int num_max = 0;
-  long int mmm; // max number of edges just for alloc
-  long int mmm_reverse; // max number of edges just for alloc
-  int degreeMax = 5;
-
-  char ch;
-  int ttsize;
-  int collect;
-  int edgeStart = 1;
-
-  char file_name[100] = DEFAULT_INPUT_FILENAME;
-  char *tracker;
-  FILE *fp;
-
-  int i;
-  int vertexCount;
-  int edgePool;
-
-  vertex *pv; // array of vertices
-  vertex *pv_reverse; // array of vertices
-
-  vertex *pCurrentVertex; // current vertex
-  vertex *pCurrentVertex_reverse; // current vertex
-
-#if ASK_FOR_INPUT
-  // get file name from user input
-  memset (file_name, 0, sizeof(file_name));//todo
-  DEBUG ("Type File name:");
-  fgets (file_name, 100, stdin);
-
-  tracker = file_name;
-
-  while (*tracker) {
-    //DEBUG ("*file_name is  (0x%x)\n", *tracker);
-    if (*tracker == 0xA || *tracker == 0xD) {
-      //DEBUG ("found new line (0x%x)\n", *tracker);
-      *tracker = 0;
-      break;
-    }
-    tracker++;
-  }
-#endif
-  // open file
-  fp = fopen (file_name, "r");  // read mode
-
-  if (fp == NULL) {
-    //DEBUG ("Error while opening the file.\n");
-    return -1;
-  }
-
-  //
-  // alloc vertices and edges array
-  //
-
-  mmm = 5105043;
-  mmm_reverse = mmm;
-
-  pv = calloc (nnn, sizeof(vertex));
-
-  pv_reverse = calloc (nnn, sizeof(vertex));
-
-  // alloc pool for edge incidented on the vertex
-  //DEBUG ("IVY: alloc pool for edge incidented on the vertex....\n");
-  for (i = 0; i < nnn; i++) {
-    (pv + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-    memset ((pv + i)->connectTo, 0, sizeof(int)*(degreeMax));
-    (pv_reverse + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-    memset ((pv_reverse + i)->connectTo, 0, sizeof(int)*(degreeMax));
-  }
-
-  //
-  // read file to get graph
-  //
-  ch = 0;
-  i = 0;
-  num = 0;
-  vertexCount = 0;
-  while (((ch = fgetc (fp)) != EOF)) {
-
-    //
-    // If get a number, collect it in num.
-    //
-    if (ch >= 0x30 && ch <= 0x39) {
-      //DEBUG ("_%d_ \n", (ch - 0x30));
-      num = num * 10 + (ch - 0x30);
-      collect = 1;
-    } else {
-
-      //
-      // If array is running out of space,
-      // double it before putting anything in it.
-      //
-      if (vertexCount >= nnn) {
-
-        //
-        // If array size is not enough, double the array size.
-        //
-        //DEBUG ("-------vertice pool not enough! (%d)\n", degreeMax);
-        nnn *= 2;
-        free (pv);
-        pv = malloc (sizeof (vertex) * nnn);
-        free (pv_reverse);
-        pv_reverse = malloc (sizeof (vertex) * nnn);
-      } // if vertex array is not big enough
-
-      if (collect == 1) { // if a number is read
-        collect = 0;
-
-        //
-        // use max of num saw to be the vertices number
-        // this assumes vertices index are continual no skipping
-        //
-        if (num > num_max) {
-          num_max = num;
-        }
-
-        if (edgeStart) {
-          edgeStart = 0;
-
-          // the num collected here is the start (tail) index of vertex of an edge
-          pCurrentVertex = &pv [num];
-          pCurrentVertex->index = num;
-
-          // for reverse G, the num collected here is the end (head) of vertex of an edge
-          temp_head = num;
-        } else {
-          edgeStart = 1;
-
-          //
-          // finish collecting an edge's two vertices
-          //
-
-          //
-          // if degreeMax not big enough, double it
-          //
-          if (pCurrentVertex->degree >= degreeMax) {
-            //DEBUG ("-------degreeMax (%d) not enough!\n", degreeMax);
-            degreeMax *= 2;
-            for (i = 0; i < nnn; i++) {
-              free ((pv + i)->connectTo);
-              (pv + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-              memset ((pv + i)->connectTo, 0, sizeof(int)*(degreeMax));
-              free ((pv_reverse + i)->connectTo);
-              (pv_reverse + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-              memset ((pv_reverse + i)->connectTo, 0, sizeof(int)*(degreeMax));
-            }
-          } // if degree Max not big enough // todo, what about the reverse
-
-          //
-          // the num here collected is the end (head) of an edge
-          //
-          pCurrentVertex->connectTo [pCurrentVertex->degree] = num;//0-base
-          DEBUG ("edge (%d, %d)\n", pCurrentVertex->index, pCurrentVertex->connectTo[pCurrentVertex->degree]);
-          pCurrentVertex->degree++;
-
-          //
-          // for reverse G, the num collected is the start (tail) of an edge
-          //
-          pCurrentVertex_reverse = &pv_reverse [num];
-          pCurrentVertex_reverse->index = num;
-          // already knew the end (head) of the edge, now fill it in.
-          pCurrentVertex_reverse->connectTo [pCurrentVertex_reverse->degree] = temp_head;
-          pCurrentVertex_reverse->degree++;
-        } // whether or not the num is collected after a new line
-
-        num = 0;
-      } // if finish collect a number from reading the file
-    } // if-else reading number or non-number
-  } // while not the end of file
-
-  //*numberVertices = vertexCount;
-  *numberVertices = num_max;
-  *V = pv;
-  *rV = pv_reverse;
-
-  fclose (fp);
-  return 0;
-}
 
 int
 PopEnd (int *wholedeal, int numTotal)
@@ -254,14 +18,6 @@ PopEnd (int *wholedeal, int numTotal)
   vertex_to_pop = wholedeal[numTotal - 1];
   // remove
   wholedeal[numTotal] = 0;
-
-#ifdef _DEBUG
-  printf ("vertices to visit: ");
-  for (int i = 0; i < numTotal; i++) {
-    printf ("%d ", wholedeal[i]);
-  }
-  printf ("\n");
-#endif
 
   return vertex_to_pop;
 }; // removes and returns the end element in the list.
@@ -291,13 +47,6 @@ append (int vertex_to_append, int *vertices_to_visit, int num_vertices_to_visit)
   // append (of course) to the end of the stack
   //
   vertices_to_visit[num_vertices_to_visit] = vertex_to_append;
-#ifdef _DEBUG
-  printf ("vertices to visit: ");
-  for (int i = 0; i < num_vertices_to_visit; i++) {
-    printf ("%d ", vertices_to_visit[i]);
-  }
-  printf ("\n");
-#endif
   return;
 }
 
@@ -337,15 +86,19 @@ takeout (int vertex_to_takeout, int *vertices, int num_vertices)
     }
   }
 }
-int DFS_Loop (
+
+int
+DFS_Loop (
   int which_pass,
   vertex *V, // Pointer to the array of vertices to be returned
   int numberVertices, // Pointer to the number of vertices to be returned
   int *index_sequence_by_finish_time,
   int *index_sequence_by_finish_time_2,
-  int *leader_group //int *largestFiveLeader
+  int *leader_group //int *leaderContainingNodes
   )
 {
+  int ttt = 1;
+  int notYetFinish;
   int len_max_vertices_to_visit;
   int len_max_vertices_visited;
   int num_vertices_to_visit = 0;
@@ -355,24 +108,32 @@ int DFS_Loop (
   int currentIndex;
   int takeoutIndex;
   int currentChildIndex;
+  int *vertices_to_visit; // only keep index of vertices
+  int *vertices_visited;
   vertex *currentVertex;
   vertex *currentChildVertex;
-  int *vertices_to_visit; // only keep index of vertices
 
-  int ttt = 1;
-  int notYetFinish;
   // only for 1st pass to compute finish_time, in particular, its sequence
-  int *vertices_visited;
+  int *temp_ptr;
 
   //
   // Initialize vertices_to_visit stack
   //
-  len_max_vertices_to_visit = 500; // todo, double this size when not enough
+  len_max_vertices_to_visit = numberVertices + 1;
+  vertices_to_visit = NULL;
   vertices_to_visit = calloc (len_max_vertices_to_visit, sizeof (int));
+  if (vertices_to_visit == NULL) {
+    DEBUG ("vertices_to_visit alloc failed\n");
+    return -1;
+  }
 
-  //if (which_pass == 1) {
-    len_max_vertices_visited  = 500;
-    vertices_visited = calloc (len_max_vertices_visited, sizeof (int));
+  len_max_vertices_visited = numberVertices + 1;
+  vertices_visited = NULL;
+  vertices_visited = calloc (len_max_vertices_visited, sizeof (int));
+  if (vertices_visited == NULL) {
+    DEBUG ("vertices_visited alloc failed\n");
+    return -1;
+  }
 
   //
   // Traverse the entire graph to call DFS from
@@ -398,14 +159,14 @@ int DFS_Loop (
     // if the vertex is already explored, go to the next vertex
     //
     if (V[currentOuterForLoopVertexIndex].Explored) {
-      DEBUG ("V[%d] is already explored\n", currentOuterForLoopVertexIndex);
+      //DEBUG ("V[%d] is already explored\n", currentOuterForLoopVertexIndex);
       continue;
     }
 
     //
     // if the vertex is not yet explored, mark it as explored
     //
-    DEBUG ("V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
+    //DEBUG ("V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
 
     //
     // init vertices_to_visit with (index of) root
@@ -431,44 +192,53 @@ int DFS_Loop (
       currentIndex = PopEnd (vertices_to_visit, num_vertices_to_visit);
       currentVertex = &V[currentIndex];
       num_vertices_to_visit--;
-      DEBUG ("Pop (%d) from stack\n", currentIndex);
+      //DEBUG ("Pop (%d) from stack\n", currentIndex);
 
       //
       // if the vertex is not yet explored, mark as explored, and look at its children
       //
       if (currentVertex->Explored == 0) {
 
-        if (currentIndex == 832872 || currentIndex == 875269) {
-          DEBUG ("%d pass Explore (%d)\n", which_pass, currentIndex);
-        }
-
-        DEBUG ("..And this vertex not yet explored. I mean (%d) who got degree (%d)\n", currentIndex, currentVertex->degree);
+        //DEBUG ("..And this vertex not yet explored. I mean (%d) who got degree (%d)\n", currentIndex, currentVertex->degree);
         currentVertex->Explored = 1; // mark as explored
 
         currentVertex->leader = currentLeaderIndex; // set leader
 
-        //
-        // leader group
-        //
-        leader_group[currentLeaderIndex]++;
+        if (leader_group) {
+          //
+          // leader group
+          //
+          leader_group[currentLeaderIndex]++;
+        }
+        /*
         if (which_pass == 2)
   {DEBUG ("(%d)'s leader(%d) has total#(%d) \n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);}
+        */
 
         //if (true) {// ##forPass2
           if (num_vertices_to_visit == len_max_vertices_visited) {
             len_max_vertices_visited *= 2;
-            vertices_visited = realloc (vertices_visited, len_max_vertices_visited);
+            DEBUG ("vertices_visited (%p) size (%d) is not big enough.\n", vertices_visited, len_max_vertices_visited);
+            temp_ptr = NULL;
+            temp_ptr = realloc (vertices_visited, len_max_vertices_visited);
+            if (temp_ptr) {
+              vertices_visited = temp_ptr;
+            } else {
+              DEBUG ("Realloc vertices_visited failed.\n");
+              return -1;
+            }
+            DEBUG ("Realloc vertices_vitited gives (%p)\n", vertices_visited);
           }
           append (currentIndex, vertices_visited, num_vertices_visited);
           num_vertices_visited++;
         //}
 
 #ifdef _DEBUG
-        //printf ("        => Trace of visited vertex: { ");
+        //DEBUG ("        => Trace of visited vertex: { ");
         //for (int ppp = 0; ppp < num_vertices_visited; ppp++) {
-          //printf ("%d ", vertices_visited[ppp]);
+          //DEBUG ("%d ", vertices_visited[ppp]);
         //}
-        //printf ("}\n");
+        //DEBUG ("}\n");
 #endif
 
         //
@@ -481,7 +251,7 @@ int DFS_Loop (
           currentChildIndex = currentVertex->connectTo[j];
           currentChildVertex = &V[currentChildIndex];
           currentChildVertex->parent_add_it_to_vertices_to_visit = currentIndex;
-          DEBUG ("  (%d)'s child (%d)\n", currentIndex, currentChildIndex);
+          //DEBUG ("  (%d)'s child (%d)\n", currentIndex, currentChildIndex);
 
           //
           // if the child vertex is not yet explored, append it to vertices_to_visit.
@@ -492,25 +262,33 @@ int DFS_Loop (
             notYetFinish = 1; // having child that is not yet explored means this vertex is not finished exploring
             append (currentChildIndex, vertices_to_visit, num_vertices_to_visit);
             num_vertices_to_visit++;
-            DEBUG ("  ..And this child is not yet explored. appended it to vertices_to_visit...\n");
+            //DEBUG ("  ..And this child is not yet explored. appended it to vertices_to_visit...\n");
             if (num_vertices_to_visit == len_max_vertices_to_visit) {
-              printf ("vertices_to_visit size (%d) is not big enough.\n", len_max_vertices_to_visit);
+              DEBUG ("vertices_to_visit (%p) size (%d) is not big enough.\n", vertices_to_visit, len_max_vertices_to_visit);
               len_max_vertices_to_visit *= 2;
-              realloc (vertices_to_visit, len_max_vertices_to_visit);
+              temp_ptr = NULL;
+              temp_ptr = realloc (vertices_to_visit, len_max_vertices_to_visit);
+              if (temp_ptr) {
+                vertices_to_visit = temp_ptr;
+              } else {
+                DEBUG ("Realloc vertices_to_visit failed.\n");
+                return -1;
+              }
+              DEBUG ("Realloc gives vertices_to_visit (%p)\n", vertices_to_visit);
             }
 
 #ifdef _DEBUG
-            //printf ("        => vertices_to_visit: [ ");
+            //DEBUG ("        => vertices_to_visit: [ ");
             //for (int k = 0; k < num_vertices_to_visit; k++) {
-              //printf ("%d ", vertices_to_visit[k]);
-            //} printf ("]\n\n");
+              //DEBUG ("%d ", vertices_to_visit[k]);
+            //} DEBUG ("]\n\n");
 #endif
           } // if the child is not explored
           else {
             //
             // It is time to "giu" back and count finish time!
             //
-            //printf ("  -- here?? finish on (%d) *****\n", currentChildIndex);
+            //DEBUG ("  -- here?? finish on (%d) *****\n", currentChildIndex);
           }
         } // for all children
 
@@ -557,7 +335,7 @@ int DFS_Loop (
                   //
                   index_sequence_by_finish_time [ttt] = vertices_visited[xxx]; //index_se... is 1-based
 #ifdef _DEBUG
-                  //printf ("  -3- here?? finish on f(%d) = (%d) *****\n\n", vertices_visited[xxx], ttt);
+                  //DEBUG ("  -3- here?? finish on f(%d) = (%d) *****\n\n", vertices_visited[xxx], ttt);
 #endif
                   ttt++;
 
@@ -570,7 +348,7 @@ int DFS_Loop (
 
                 } else {
 #ifdef _DEBUG
-                  //printf ("\n");
+                  //DEBUG ("\n");
 #endif
                   break;
                 }
@@ -582,7 +360,7 @@ int DFS_Loop (
             //
             index_sequence_by_finish_time [ttt] = currentIndex; //index_se... is 1-based
 #ifdef _DEBUG
-            //printf ("  -1- here?? finish on f(%d) = (%d) *****\n\n", currentIndex, ttt);
+            //DEBUG ("  -1- here?? finish on f(%d) = (%d) *****\n\n", currentIndex, ttt);
 #endif
             ttt++;
 
@@ -613,7 +391,7 @@ int DFS_Loop (
           //
           index_sequence_by_finish_time [ttt] = takeoutIndex; //index_se... is 1-based
 #ifdef _DEBUG
-          //printf ("  -2- here?? finish on f(%d) = (%d) *****\n\n", takeoutIndex, ttt);
+          //DEBUG ("  -2- here?? finish on f(%d) = (%d) *****\n\n", takeoutIndex, ttt);
 #endif
           ttt++;
 
@@ -636,7 +414,11 @@ Reverse (vertex *V)
 }
 
 
-int compare_ints(const void* a, const void* b)
+int
+compare_ints (
+  const void* a,
+  const void* b
+  )
 {
     int arg1 = *(const int*)a;
     int arg2 = *(const int*)b;
@@ -657,15 +439,13 @@ int main ()
   int _numberVertices;
   int *reverse_seq_for_secondpass;
   int *intArray;
-  int *largestFiveLeader;
+  int *leaderContainingNodes;
+  int ret;
 
   double time_spent_readFile, time_spent_Pass1, time_spent_Pass2, time_spent_total;
   clock_t end, t_afterReadFile, t_afterDFSLoopPass1, t_afterDFSLoopPass2;
   clock_t begin = clock();
 
-  //
-  // Read input from file ...
-  //
   DEBUG ("Start reading girl~\n");
   if (0 != ReadFileToAdjList (
              &_V,
@@ -675,31 +455,36 @@ int main ()
     return -1;
   }
 
+  DEBUG ("Calling 1st pass DFS_Loop, #v (%d)\n", _numberVertices);
 
   t_afterReadFile = clock();
   time_spent_readFile = (double)(t_afterReadFile - begin) / CLOCKS_PER_SEC;
-  printf ("time spent on reading file (%f)\n", time_spent_readFile);
+  DEBUG ("time spent on reading file (%f)\n", time_spent_readFile);
+
+
 
   reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   intArray = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   reverse_seq_for_secondpass [0] = 0; // this slot is not used
-  largestFiveLeader = malloc (sizeof (int) * (_numberVertices + 1));
 
-  DEBUG ("Calling 1st pass DFS_Loop, #v (%d)\n", _numberVertices);
 
-  DFS_Loop (1, _rV, _numberVertices, reverse_seq_for_secondpass, intArray, largestFiveLeader);
+  ret = DFS_Loop (1, _rV, _numberVertices, reverse_seq_for_secondpass, intArray, NULL);
 
+  if (ret != 0) {
+    DEBUG ("DFS 1st loop returned error.\n");
+    return -1;
+  }
   t_afterDFSLoopPass1 = clock();
 
   time_spent_Pass1 = (double)(t_afterDFSLoopPass1 - t_afterReadFile) / CLOCKS_PER_SEC;
-  printf ("time spent on DFS_Loop 1st pass (%f)\n", time_spent_Pass1);
+  DEBUG ("time spent on DFS_Loop 1st pass (%f)\n", time_spent_Pass1);
 
 #ifdef _DEBUG
-  printf ("reverse_seq_for_secondpass is: [ ");
-  for (int i = 1; i <= _numberVertices; i++) {
-    printf ("%d ", reverse_seq_for_secondpass [i]);
-  }
-  printf ("]\n");
+  //DEBUG ("reverse_seq_for_secondpass is: [ ");
+  //for (int i = 1; i <= _numberVertices; i++) {
+    //DEBUG ("%d ", reverse_seq_for_secondpass [i]);
+  //}
+  //DEBUG ("]\n");
 #endif
 
   free (_rV);
@@ -707,32 +492,37 @@ int main ()
   //
   // Processing vertices in decreasing order of finishing times
   //
-  memset (largestFiveLeader, 0, sizeof (int) * (_numberVertices + 1));
-  memcpy (intArray, reverse_seq_for_secondpass, sizeof (int) * (_numberVertices + 1));
+  leaderContainingNodes = NULL;
+  leaderContainingNodes = calloc ((_numberVertices + 1), sizeof (int));
 
-  DFS_Loop (2, _V, _numberVertices, reverse_seq_for_secondpass, intArray, largestFiveLeader);
+  ret = DFS_Loop (2, _V, _numberVertices, reverse_seq_for_secondpass, intArray, leaderContainingNodes);
+
+  if (ret != 0) {
+    DEBUG ("DFS 2nd loop returned error.\n");
+    return -1;
+  }
 
   t_afterDFSLoopPass2 = clock();
   time_spent_Pass2 = (double)(t_afterDFSLoopPass2 - t_afterDFSLoopPass1) / CLOCKS_PER_SEC;
-  printf ("time spent on DFS_Loop 2nd pass (%f)\n", time_spent_Pass2);
+  DEBUG ("time spent on DFS_Loop 2nd pass (%f)\n", time_spent_Pass2);
 
-  qsort(largestFiveLeader, (_numberVertices + 1), sizeof(int), compare_ints);
-  printf ("largestFiveLeader is: [ ");
-  for (int i = 0; i < 5; i++) {
-    printf ("%d ", largestFiveLeader[_numberVertices - i]);
+  qsort(leaderContainingNodes, (_numberVertices + 1), sizeof(int), compare_ints);
+  DEBUG ("leaderContainingNodes is: [ ");
+  for (int i = 0; i < 6; i++) {
+    printf ("%d ", leaderContainingNodes[_numberVertices - i]);
   }
   printf ("]\n");
 
   free (_V);
-  free (largestFiveLeader);
+  free (leaderContainingNodes);
   free (intArray);
   free (reverse_seq_for_secondpass);
   end = clock();
   time_spent_total = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf ("time spent totally (%f)\n", time_spent_total);
-  printf ("\tReadFile takes %f %% \n", time_spent_readFile * 100.0/time_spent_total);
-  printf ("\t1st Pass takes %f %% \n", time_spent_Pass1 * 100.0/time_spent_total);
-  printf ("\t2nd Pass takes %f %% \n", time_spent_Pass2 * 100.0/time_spent_total);
+  DEBUG ("time spent totally (%f)\n", time_spent_total);
+  DEBUG ("\tReadFile takes %f %% \n", time_spent_readFile * 100.0/time_spent_total);
+  DEBUG ("\t1st Pass takes %f %% \n", time_spent_Pass1 * 100.0/time_spent_total);
+  DEBUG ("\t2nd Pass takes %f %% \n", time_spent_Pass2 * 100.0/time_spent_total);
 
   return 0;
 }
