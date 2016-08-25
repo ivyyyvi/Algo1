@@ -12,11 +12,14 @@ endif
 INPUT = a
 ifeq ($(INPUT), a)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_A
+
+else ifeq ($(INPUT), b)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_B
 endif
 
 CC = gcc
 DEPS = SCC.h
-OBJ = SCC.o ProcessInput.o
+OBJ = SCC.o ProcessInput.o DFS.o
 CFLAGS += -I.
 
 

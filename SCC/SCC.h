@@ -16,6 +16,9 @@ extern int nnn;
 #ifdef DEFAULT_INPUT_FILENAME_A
   #define DEFAULT_INPUT_FILENAME "testInput003.txt"
 #endif
+#ifdef DEFAULT_INPUT_FILENAME_B
+  #define DEFAULT_INPUT_FILENAME "sinput0.txt"
+#endif
 
 //#define _DEBUG_PROCESS_INPUT
 
@@ -55,6 +58,16 @@ ReadFileToAdjList (
   int *numberVertices // Pointer to the number of vertices to be returned
   );
 
+int
+DFS_Loop (
+  int which_pass,
+  vertex *V, // Pointer to the array of vertices to be returned
+  int numberVertices, // Pointer to the number of vertices to be returned
+  int *index_sequence_by_finish_time,
+  int *index_sequence_by_finish_time_2,
+  int *leader_group //int *leaderContainingNodes
+  );
+
 //
 // Struct definitions
 //
@@ -82,4 +95,3 @@ struct _graph {
   vertex* vertex_list;
   vertex* (*first) (listClass *list);
 };*/
-
