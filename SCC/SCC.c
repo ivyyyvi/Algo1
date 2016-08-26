@@ -144,6 +144,7 @@ int main ()
   t_afterReadFile = clock();
   time_spent_readFile = (double)(t_afterReadFile - begin) / CLOCKS_PER_SEC;
   DEBUG ("time spent on reading file (%f)\n\n", time_spent_readFile);
+  DEBUG ("------------------------------------\n");
 
   reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   intArray = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
@@ -151,16 +152,25 @@ int main ()
 
 
   DEBUG ("Calling 1st pass DFS_Loop, #v (%d) ...\n", _numberVertices);
-  ret = DFS_Loop (1, _rV, _numberVertices, reverse_seq_for_secondpass, intArray, NULL);
+  ret = DFS_Loop (
+          1,
+          _rV,
+          _numberVertices,
+          reverse_seq_for_secondpass,
+          intArray,
+          NULL);
 
   if (ret != 0) {
     DEBUG ("DFS 1st loop returned error.\n");
     return -1;
   }
-  t_afterDFSLoopPass1 = clock();
 
-  time_spent_Pass1 = (double)(t_afterDFSLoopPass1 - t_afterReadFile) / CLOCKS_PER_SEC;
+  t_afterDFSLoopPass1 = clock();
+  time_spent_Pass1 =
+    (double)(t_afterDFSLoopPass1 - t_afterReadFile) / CLOCKS_PER_SEC;
+
   DEBUG ("time spent on DFS_Loop 1st pass (%f)\n", time_spent_Pass1);
+  DEBUG ("------------------------------------\n");
 
 #ifdef _DEBUG
   //DEBUG ("reverse_seq_for_secondpass is: [ ");
@@ -178,7 +188,13 @@ int main ()
   leaderContainingNodes = NULL;
   leaderContainingNodes = calloc ((_numberVertices + 1), sizeof (int));
 
-  ret = DFS_Loop (2, _V, _numberVertices, reverse_seq_for_secondpass, intArray, leaderContainingNodes);
+  ret = DFS_Loop (
+          2,
+          _V,
+          _numberVertices,
+          reverse_seq_for_secondpass,
+          intArray,
+          leaderContainingNodes);
 
   if (ret != 0) {
     DEBUG ("DFS 2nd loop returned error.\n");
@@ -186,10 +202,14 @@ int main ()
   }
 
   t_afterDFSLoopPass2 = clock();
-  time_spent_Pass2 = (double)(t_afterDFSLoopPass2 - t_afterDFSLoopPass1) / CLOCKS_PER_SEC;
+  time_spent_Pass2 =
+    (double)(t_afterDFSLoopPass2 - t_afterDFSLoopPass1) / CLOCKS_PER_SEC;
+
   DEBUG ("time spent on DFS_Loop 2nd pass (%f)\n", time_spent_Pass2);
+  DEBUG ("------------------------------------\n");
 
   qsort(leaderContainingNodes, (_numberVertices + 1), sizeof(int), compare_ints);
+
   DEBUG ("leaderContainingNodes is: [ ");
   for (int i = 0; i < 6; i++) {
     printf ("%d ", leaderContainingNodes[_numberVertices - i]);
@@ -202,10 +222,16 @@ int main ()
   free (reverse_seq_for_secondpass);
   end = clock();
   time_spent_total = (double)(end - begin) / CLOCKS_PER_SEC;
-  DEBUG ("time spent totally (%f)\n", time_spent_total);
-  DEBUG ("\tReadFile takes %f %% \n", time_spent_readFile * 100.0/time_spent_total);
-  DEBUG ("\t1st Pass takes %f %% \n", time_spent_Pass1 * 100.0/time_spent_total);
-  DEBUG ("\t2nd Pass takes %f %% \n", time_spent_Pass2 * 100.0/time_spent_total);
+
+  DEBUG ("------------------------------------\n");
+  DEBUG ("Totally takes  (%f)\n",\
+    time_spent_total);
+  DEBUG ("\tReadFile takes %f %% \n",\
+    time_spent_readFile * 100.0/time_spent_total);
+  DEBUG ("\t1st Pass DFS takes %f %% \n",\
+    time_spent_Pass1 * 100.0/time_spent_total);
+  DEBUG ("\t2nd Pass DFS takes %f %% \n",\
+    time_spent_Pass2 * 100.0/time_spent_total);
 
   return 0;
 }

@@ -72,20 +72,20 @@ DFS_Loop (
         break;
     }
 
-    DEBUG_DFS ("<%d pass for loop%dth explorers V[%d]>\n", \
-        which_pass,\
-        sss, \
-        currentOuterForLoopVertexIndex);
+    DEBUG_DFS ("<V[%d] by %d pass for loop%dth>\n", \
+                sss, \
+                which_pass,\
+                currentOuterForLoopVertexIndex);
 
     //
     // if the vertex is already explored, go to the next vertex
     //
     if (V[currentOuterForLoopVertexIndex].Explored) {
-      DEBUG_DFS (" V[%d] is already explored\n", currentOuterForLoopVertexIndex);
+      DEBUG_DFS (" ,but V[%d] is already explored\n", currentOuterForLoopVertexIndex);
       continue;
     }
 
-    DEBUG_DFS (" V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
+    DEBUG_DFS (" ,V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
 
     //
     // init vertices_to_visit with (index of) root
@@ -122,8 +122,8 @@ DFS_Loop (
       if (currentVertex->Explored == 0) {
 
         DEBUG_DFS (",and V[%d] not yet explored. who got degree (%d)\n",\
-            currentIndex, \
-            currentVertex->degree);
+                   currentIndex, \
+                   currentVertex->degree);
 
         currentVertex->Explored = 1; // mark as explored
 
@@ -140,8 +140,8 @@ DFS_Loop (
           len_max_vertices_visited *= 2;
 
           DEBUG_DFS ("vertices_visited (%p) size (%d) is not big enough.\n",\
-              vertices_visited, \
-              len_max_vertices_visited);
+                      vertices_visited, \
+                      len_max_vertices_visited);
 
           temp_ptr = NULL;
           temp_ptr = realloc (vertices_visited, len_max_vertices_visited);
@@ -200,7 +200,8 @@ DFS_Loop (
             DEBUG_DFS ("  ,appended it to vertices_to_visit...\n");
 
             if (num_vertices_to_visit == len_max_vertices_to_visit) {
-              DEBUG_DFS ("vertices_to_visit (%p) size (%d) is not big enough.\n", vertices_to_visit, len_max_vertices_to_visit);
+              DEBUG_DFS ("vertices_to_visit (%p) size (%d) is not big enough.\n",\
+                          vertices_to_visit, len_max_vertices_to_visit);
               len_max_vertices_to_visit *= 2;
               temp_ptr = NULL;
               temp_ptr = realloc (vertices_to_visit, len_max_vertices_to_visit);
@@ -210,11 +211,13 @@ DFS_Loop (
                 DEBUG_DFS ("Realloc vertices_to_visit failed.\n");
                 return -1;
               }
-              DEBUG_DFS ("Realloc gives vertices_to_visit (%p)\n", vertices_to_visit);
+
+              DEBUG_DFS ("Realloc gives vertices_to_visit (%p)\n",\
+                          vertices_to_visit);
             }
 
 #ifdef _DEBUG
-            DEBUG_DFS ("        => vertices_to_visit: [ ");
+            DEBUG_DFS ("    => vertices_to_visit: [ ");
             for (int k = 0; k < num_vertices_to_visit; k++) {
               printf ("%d ", vertices_to_visit[k]);
             } printf ("]\n\n");
@@ -281,8 +284,9 @@ DFS_Loop (
                   index_sequence_by_finish_time [ttt] = vertices_visited[xxx];
                   //index_se... is 1-based
 #ifdef _DEBUG
-                  DEBUG_DFS ("  -3- here?? finish on f(%d) = (%d) *****\n\n",\
-                      vertices_visited[xxx], ttt);
+                  DEBUG_DFS ("  -3- finish? wrong need fix."
+                             " f(V[%d]) = %d\n\n",\
+                             vertices_visited[xxx], ttt);
 #endif
                   ttt++;
 
@@ -312,8 +316,8 @@ DFS_Loop (
             //index_se... is 1-based
 #ifdef _DEBUG
             DEBUG_DFS ("  -1- here?? finish on f(%d) = (%d) *****\n\n",\
-                currentIndex, \
-                ttt);
+                       currentIndex, \
+                       ttt);
 #endif
             ttt++;
 
@@ -347,8 +351,8 @@ DFS_Loop (
 
 #ifdef _DEBUG
         DEBUG_DFS ("  -2- here?? finish on f(%d) = (%d) *****\n\n",\
-            takeoutIndex, \
-            ttt);
+                    takeoutIndex, \
+                    ttt);
 #endif
         ttt++;
 
