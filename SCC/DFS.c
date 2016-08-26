@@ -71,6 +71,7 @@ DFS_Loop (
       default:
         break;
     }
+
     DEBUG_DFS ("<%d pass for loop%dth explorers V[%d]>\n", \
         which_pass,\
         sss, \
@@ -84,9 +85,6 @@ DFS_Loop (
       continue;
     }
 
-    //
-    // if the vertex is not yet explored, mark it as explored
-    //
     DEBUG_DFS (" V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
 
     //
@@ -138,7 +136,7 @@ DFS_Loop (
           leader_group[currentLeaderIndex]++;
         }
 
-        if (num_vertices_to_visit == len_max_vertices_visited) {
+        if (num_vertices_visited == len_max_vertices_visited) {
           len_max_vertices_visited *= 2;
 
           DEBUG_DFS ("vertices_visited (%p) size (%d) is not big enough.\n",\
