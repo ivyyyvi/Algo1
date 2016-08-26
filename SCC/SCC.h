@@ -23,7 +23,7 @@ extern int nnn;
 //#define _DEBUG_PROCESS_INPUT
 
 #ifdef _DEBUG_PROCESS_INPUT
-#define DEBUG_PROCESS_INPUT(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
+#define DEBUG_PROCESS_INPUT(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
 #else
 #define DEBUG_PROCESS_INPUT(args...)
 #endif
@@ -31,7 +31,7 @@ extern int nnn;
 #define _DEBUG_DFS
 
 #ifdef _DEBUG_DFS
-#define DEBUG_DFS(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
+#define DEBUG_DFS(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
 #else
 #define DEBUG_DFS(args...)
 #endif
@@ -39,7 +39,7 @@ extern int nnn;
 #define _DEBUG
 
 #ifdef _DEBUG
-#define DEBUG(format, args...) printf("[%s:%d] "format, __FILE__, __LINE__, ##args)
+#define DEBUG(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
 #else
 #define DEBUG(args...)
 #endif
@@ -50,6 +50,21 @@ typedef struct _edge edge;
 //
 // Function prototypes
 //
+
+int
+PopEnd (int *wholedeal, int numTotal);
+
+int
+first (int *wholedeal, int numTotal);
+
+void
+append (int vertex_to_append, int *vertices_to_visit, int num_vertices_to_visit);
+
+void
+prepend (int vertex_to_prepend, int *vertices_to_visit, int num_vertices_to_visit);
+
+void
+takeout (int vertex_to_takeout, int *vertices, int num_vertices);
 
 int
 ReadFileToAdjList (
@@ -78,7 +93,7 @@ struct _vertex {
   int degree;
   int Explored;
   int leader;
-  int parent_add_it_to_vertices_to_visit;
+  int parentVertex; // parent_add_it_to_vertices_to_visit
   int *connectTo;
 };
 
