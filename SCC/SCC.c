@@ -192,6 +192,7 @@ int main ()
   leaderContainingNodes = NULL;
   leaderContainingNodes = calloc ((_numberVertices + 1), sizeof (int));
 
+  DEBUG ("Calling 2nd pass DFS_Loop ...\n\n");
   ret = DFS_Loop (
           2,
           _V,

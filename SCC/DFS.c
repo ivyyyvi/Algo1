@@ -74,8 +74,8 @@ DFS_Loop (
 
     DEBUG_DFS ("<V[%d] by %d pass for %dth loop>\n", \
                 currentOuterForLoopVertexIndex,\
-                sss, \
-                which_pass);
+                which_pass,\
+                sss);
 
     //
     // if the vertex is already explored, go to the next vertex
@@ -115,7 +115,7 @@ DFS_Loop (
       currentIndex = PopEnd (vertices_to_visit, num_vertices_to_visit);
       currentVertex = &V[currentIndex];
       num_vertices_to_visit--;
-      DEBUG_DFS ("Pop (%d) from stack\n", currentIndex);
+      DEBUG_DFS ("  Pop (%d) from stack\n", currentIndex);
 
       //
       // if the vertex is not yet explored, mark as explored,
@@ -123,7 +123,7 @@ DFS_Loop (
       //
       if (currentVertex->Explored == 0) {
 
-        DEBUG_DFS (",and V[%d] not yet explored. who got degree (%d)\n",\
+        DEBUG_DFS ("  ,and V[%d] not yet explored. who got degree (%d)\n",\
                    currentIndex, \
                    currentVertex->degree);
 
@@ -181,7 +181,7 @@ DFS_Loop (
           currentChildIndex = currentVertex->connectTo[j];
           currentChildVertex = &V[currentChildIndex];
           currentChildVertex->parentVertex = currentIndex;
-          DEBUG_DFS ("  (%d)'s child (%d)\n", currentIndex, currentChildIndex);
+          DEBUG_DFS ("    (%d)'s child (%d)\n", currentIndex, currentChildIndex);
 
           //
           // if the child vertex is not yet explored,
@@ -198,8 +198,8 @@ DFS_Loop (
             append (currentChildIndex, vertices_to_visit, num_vertices_to_visit);
             num_vertices_to_visit++;
 
-            DEBUG_DFS ("  ,le child not yet expl'ed.\n");
-            DEBUG_DFS ("  ,appended it to vertices_to_visit...\n");
+            DEBUG_DFS ("    ,le child not yet expl'ed.\n");
+            DEBUG_DFS ("    ,appended it to vertices_to_visit...\n");
 
             if (num_vertices_to_visit == len_max_vertices_to_visit) {
               DEBUG_DFS ("vertices_to_visit (%p) size (%d) is not big enough.\n",\
@@ -219,7 +219,7 @@ DFS_Loop (
             }
 
 #ifdef _DEBUG
-            DEBUG_DFS ("    => vertices_to_visit: [ ");
+            DEBUG_DFS ("      => vertices_to_visit: [ ");
             for (int k = 0; k < num_vertices_to_visit; k++) {
               printf ("%d ", vertices_to_visit[k]);
             } printf ("]\n\n");
