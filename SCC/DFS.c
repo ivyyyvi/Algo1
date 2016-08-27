@@ -73,9 +73,9 @@ DFS_Loop (
     }
 
     DEBUG_DFS ("<V[%d] by %d pass for %dth loop>\n", \
+                currentOuterForLoopVertexIndex,\
                 sss, \
-                which_pass,\
-                currentOuterForLoopVertexIndex);
+                which_pass);
 
     //
     // if the vertex is already explored, go to the next vertex
