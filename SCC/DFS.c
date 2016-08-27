@@ -11,8 +11,8 @@ DFS_Loop (
   int *leader_group //int *leaderContainingNodes
   )
 {
-  int ttt = 1;
-  int notYetFinish;
+  int ttt = 1; // index_se... is 1-based is 1-based
+  int currentVertexFinished;
   int len_max_vertices_to_visit;
   int len_max_vertices_visited;
   int num_vertices_to_visit = 0;
@@ -171,12 +171,12 @@ DFS_Loop (
 
         //
         // Traverse children vertices,
-        // if none of the children is unexplored,
-        // count the finishing time of the currentVertex
+        // if all children are explored,
+        // this currentVertex is finished.
+        // Count the finishing time of the currentVertex
         //
-        notYetFinish = 0;
-        //for (int j = currentVertex->degree - 1;j >= 0; j--) same w/ lesson
-        // remember to add brace
+        currentVertexFinished = 1;
+
         for (int j = 0; j < currentVertex->degree; j++) { // diff with lesson
           currentChildIndex = currentVertex->connectTo[j];
           currentChildVertex = &V[currentChildIndex];
@@ -192,9 +192,10 @@ DFS_Loop (
           // then it should be marked explored.
           //
           if (currentChildVertex->Explored == 0) {
+
             // having child that is not yet explored
-            // means this vertex is not finished exploring
-            notYetFinish = 1;
+            // means this vertex is not finished
+            currentVertexFinished = 0;
             append (currentChildIndex, vertices_to_visit, num_vertices_to_visit);
             num_vertices_to_visit++;
 
@@ -216,7 +217,7 @@ DFS_Loop (
 
               DEBUG_DFS ("Realloc gives vertices_to_visit (%p)\n",\
                           vertices_to_visit);
-            }
+            } // if vertices_to_visit array size too small
 
 #ifdef _DEBUG
             DEBUG_DFS ("      => vertices_to_visit: [ ");
@@ -224,108 +225,102 @@ DFS_Loop (
               printf ("%d ", vertices_to_visit[k]);
             } printf ("]\n\n");
 #endif
-          } // if the child is not explored
-          else {
-            //
-            // It is time to "giu" back and count finish time!
-            //
-            //DEBUG_DFS ("  -- here?? finish on (%d) *****\n", currentChildIndex);
-          }
+
+          } // if this child is not explored
         } // for all children
 
-        //if (which_pass == 1) {
+
+        if (currentVertexFinished) {
 
           //
-          // Check if this vertex is finished. If yes, count finishing time.
+          // Alright, currentVertex finished its job!
           //
 
-          if (notYetFinish == 0) {
+          //
+          // Let's take it out from the visited stack
+          //
+          takeout (currentIndex, vertices_visited, num_vertices_visited);
+          num_vertices_visited--;
 
-            //
-            // Alright, currentVertex finished its job!
-            //
+          //
+          // To compute the correct finish_time
+          // before giving awards (finishing time) to currentVertex,
+          // we should check if
+          //   currentIndex is awarded ...
+          //   when it is living before its parent
+          //   who add it to vertices_to_visit before it was taken out
+          //   i.e. is its parent now sit at
+          //        the very beginning of the vertices_visited
+          // if not,
+          // take out all that block its parent's way,
+          // awards the taken out ones first
+          // child need to be awarded before its parent
+          // in the vertices_visited stack world.
+          // Or it would on a wrong place to award them!
+          // Its parent needs to see.
+          //
+          DEBUG_DFS ("Who is at front seat of vertices_visited "
+                     "when (%d) is awarded finish_time ...?\n",\
+                      currentIndex);
+          if (vertices_visited[0] == currentVertex->parentVertex) {
 
-            //
-            // Let's take it out from the visited stack
-            //
-            takeout (currentIndex, vertices_visited, num_vertices_visited);
-            num_vertices_visited--;
+            DEBUG_DFS ("oh yeah. it is its parent! good!\n");
 
-            //
-            // To compute the correct finish_time
-            // before giving awards (finishing time) to currentVertex,
-            // we should check if
-            //   currentIndex is awarded ...
-            //   when it is living before its parent
-            //   who add it to vertices_to_visit before it was taken out
-            //   i.e. is its parent now sit at
-            //        the very beginning of the vertices_visited
-            // if not,
-            // take out all that block its parent's way,
-            // awards the taken out ones first
-            // child need to be before its parent
-            // in the vertices_visited stack world.
-            // Or it would on a wrong place to award them!
-            // Its parent needs to see.
-            //
-            //DEBUG_DFS ("Who is at front seat of vertices_visited "
-            //"when (%d) is awarded finish_time ...?\n", currentIndex);
-            if (vertices_visited[0] == currentVertex->parentVertex) {
-              //DEBUG_DFS ("oh yeah. it is its parent! good!\n");
-            } else {
-              //DEBUG_DFS ("Well, not currentVertex's parent (%d) "
-              //"instead it is ..\n", currentVertex->parentVertex);
-              for (int xxx = 0; num_vertices_visited > 0;) {
+          } else {
 
-                if (vertices_visited[xxx]
-                    != currentVertex->parentVertex) {
+            DEBUG_DFS ("Well, not currentVertex's parent (%d) "
+                       "instead it is ..\n",\
+                       currentVertex->parentVertex);
 
-                  //
-                  // Remember to award (give finish_time to) them
-                  //
-                  index_sequence_by_finish_time [ttt] = vertices_visited[xxx];
-                  //index_se... is 1-based
+            for (int xxx = 0; num_vertices_visited > 0;) {
+
+              if (vertices_visited[xxx]
+                  != currentVertex->parentVertex) {
+
+                //
+                // Remember to award (give finish_time to) them
+                //
+                index_sequence_by_finish_time [ttt] = vertices_visited[xxx];
+
 #ifdef _DEBUG
-                  DEBUG_DFS ("  -3- finish? wrong need fix."
-                             " f(V[%d]) = %d\n\n",\
-                             vertices_visited[xxx], ttt);
+                DEBUG_DFS ("  -3- finish? wrong need fix."
+                           " f(V[%d]) = %d\n\n",\
+                           vertices_visited[xxx], ttt);
 #endif
-                  ttt++;
+                ttt++;
 
-                  //
-                  // Take it out of vertices_visited
-                  //
-                  takeout (
-                      vertices_visited[xxx],
-                      vertices_visited,
-                      num_vertices_visited);
-                  num_vertices_visited--;
+                //
+                // Take it out of vertices_visited
+                //
+                takeout (
+                    vertices_visited[xxx],
+                    vertices_visited,
+                    num_vertices_visited);
+                num_vertices_visited--;
 
 
-                } else {
+              } else {
 #ifdef _DEBUG
-                  //DEBUG_DFS ("\n");
+                //DEBUG_DFS ("\n");
 #endif
-                  break;
-                }
-              } // for
-            } // if-else
+                break;
+              }
+            } // for
+          } // if-else
 
-            //
-            // Or this? It is time to "giu" back and count finish time!
-            //
-            index_sequence_by_finish_time [ttt] = currentIndex;
-            //index_se... is 1-based
+          //
+          // Or this? It is time to "giu" back and count finish time!
+          //
+          index_sequence_by_finish_time [ttt] = currentIndex;
+
 #ifdef _DEBUG
-            DEBUG_DFS ("  -1- here?? finish on f(%d) = (%d) *****\n\n",\
-                       currentIndex, \
-                       ttt);
+          DEBUG_DFS ("  -1- here?? finish on f(%d) = (%d) *****\n\n",\
+                     currentIndex, \
+                     ttt);
 #endif
-            ttt++;
+          ttt++;
 
-          } // if finished this vertex
-        //} // if 1st pass
-
+        } // if finished this vertex
       } // if current vertex is not yet explored. else {}
     } // while
 
@@ -349,7 +344,7 @@ DFS_Loop (
         // Or this? It is time to "giu" back and count finish time!
         //
         index_sequence_by_finish_time [ttt] = takeoutIndex;
-        //index_se... is 1-based
+
 
 #ifdef _DEBUG
         DEBUG_DFS ("  -2- here?? finish on f(%d) = (%d) *****\n\n",\
