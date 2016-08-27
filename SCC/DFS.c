@@ -72,7 +72,7 @@ DFS_Loop (
         break;
     }
 
-    DEBUG_DFS ("<V[%d] by %d pass for loop%dth>\n", \
+    DEBUG_DFS ("<V[%d] by %d pass for %dth loop>\n", \
                 sss, \
                 which_pass,\
                 currentOuterForLoopVertexIndex);
@@ -81,11 +81,13 @@ DFS_Loop (
     // if the vertex is already explored, go to the next vertex
     //
     if (V[currentOuterForLoopVertexIndex].Explored) {
-      DEBUG_DFS (" ,but V[%d] is already explored\n", currentOuterForLoopVertexIndex);
+      DEBUG_DFS (" ,but V[%d] is already explored\n",\
+                  currentOuterForLoopVertexIndex);
       continue;
     }
 
-    DEBUG_DFS (" ,V[%d] is not yet explored\n", currentOuterForLoopVertexIndex);
+    DEBUG_DFS (" ,V[%d] is not yet explored\n",\
+                currentOuterForLoopVertexIndex);
 
     //
     // init vertices_to_visit with (index of) root

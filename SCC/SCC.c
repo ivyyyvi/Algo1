@@ -147,7 +147,7 @@ int main ()
   DEBUG ("------------------------------------\n");
 
   reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
-  intArray = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
+  intArray                   = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   reverse_seq_for_secondpass [0] = 0; // this slot is not used
 
 
@@ -185,6 +185,10 @@ int main ()
   //
   // Processing vertices in decreasing order of finishing times
   //
+
+  memcpy ((void *)intArray, (void *)reverse_seq_for_secondpass,
+    sizeof (int) * (_numberVertices + 1));
+
   leaderContainingNodes = NULL;
   leaderContainingNodes = calloc ((_numberVertices + 1), sizeof (int));
 
