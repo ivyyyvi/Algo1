@@ -11,13 +11,13 @@ else
  	CFLAGS = -g
 endif
 
-INPUT = D
-ifeq ($(INPUT), A)
+INPUT = B
+ifeq ($(INPUT), Z)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_Z
+else ifeq ($(INPUT), A)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_A
-
 else ifeq ($(INPUT), B)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_B
-
 else ifeq ($(INPUT), C)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_C
 else ifeq ($(INPUT), D)
@@ -29,7 +29,7 @@ else ifeq ($(INPUT), F)
 else ifeq ($(INPUT), G)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_G
 else ifeq ($(INPUT), H)
-	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_H
+	CFLAHS += -g -DDEFAULT_INPUT_FILENAME_H
 endif
 
 CC = gcc

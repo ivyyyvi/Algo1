@@ -10,32 +10,34 @@ extern int nnn;
 
 #define ASK_FOR_INPUT 0
 
+// input_Z.txt is the input from PA
+#ifdef DEFAULT_INPUT_FILENAME_Z
+  #define DEFAULT_INPUT_FILENAME "input_Z.txt"
+#endif
 #ifdef DEFAULT_INPUT_FILENAME_A
-  #define DEFAULT_INPUT_FILENAME "input.txt"
+  #define DEFAULT_INPUT_FILENAME "input_A.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_B
-  #define DEFAULT_INPUT_FILENAME "testInput003.txt"
+  #define DEFAULT_INPUT_FILENAME "input_B.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_C
-  #define DEFAULT_INPUT_FILENAME "sinput0.txt"
+  #define DEFAULT_INPUT_FILENAME "input_C.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_D
-  #define DEFAULT_INPUT_FILENAME "sinput1.txt"
+  #define DEFAULT_INPUT_FILENAME "input_D.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_E
-  #define DEFAULT_INPUT_FILENAME "sinput2.txt"
+  #define DEFAULT_INPUT_FILENAME "input_E.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_F
-  #define DEFAULT_INPUT_FILENAME "sinput3.txt"
+  #define DEFAULT_INPUT_FILENAME "input_F.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_G
-  #define DEFAULT_INPUT_FILENAME "sinput4.txt"
+  #define DEFAULT_INPUT_FILENAME "input_G.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_H
-  #define DEFAULT_INPUT_FILENAME "sinput0.txt"
+  #define DEFAULT_INPUT_FILENAME "input_H.txt"
 #endif
-
-
 
 #ifdef _DEBUG_PROCESS_INPUT
 #define DEBUG_PROCESS_INPUT(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
