@@ -173,11 +173,11 @@ int main ()
   DEBUG ("------------------------------------\n");
 
 #ifdef _DEBUG
-  //DEBUG ("reverse_seq_for_secondpass is: [ ");
-  //for (int i = 1; i <= _numberVertices; i++) {
-    //DEBUG ("%d ", reverse_seq_for_secondpass [i]);
-  //}
-  //DEBUG ("]\n");
+  DEBUG ("reverse_seq_for_secondpass is: [ ");
+  for (int i = 1; i <= _numberVertices; i++) {
+    printf ("%d ", reverse_seq_for_secondpass [i]);
+  }
+  printf ("]\n");
 #endif
 
   free (_rV);
