@@ -2,22 +2,34 @@
 DEBUG = y
 ifeq ($(DEBUG), y)
   #enale either of the following 3 to perform different test
-	CFLAGS = -g -DSMALLSETSTEST
-	CFLAGS = -g -DSINGLESETTEST
-	CFLAGS = -g -DPIVOTTEST
+	CFLAGS = -g
+	CFLAGS += -D_DEBUG
+	#CFLAGS += -D_DEBUG_MAIN
+	#CFLAGS += -D_DEBUG_DFS
+	#CFLAGS += -D_DEBUG_PROCESS_INPUT
 else
  	CFLAGS = -g
 endif
 
-INPUT = c
-ifeq ($(INPUT), a)
+INPUT = D
+ifeq ($(INPUT), A)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_A
 
-else ifeq ($(INPUT), b)
+else ifeq ($(INPUT), B)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_B
 
-else ifeq ($(INPUT), c)
+else ifeq ($(INPUT), C)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_C
+else ifeq ($(INPUT), D)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_D
+else ifeq ($(INPUT), E)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_E
+else ifeq ($(INPUT), F)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_F
+else ifeq ($(INPUT), G)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_G
+else ifeq ($(INPUT), H)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_H
 endif
 
 CC = gcc

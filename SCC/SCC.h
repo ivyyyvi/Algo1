@@ -9,21 +9,33 @@ extern int nnn;
 
 
 #define ASK_FOR_INPUT 0
-//#define DEFAULT_INPUT_FILENAME "sinput3.txt"
-//#define DEFAULT_INPUT_FILENAME "input.txt"
-//#define DEFAULT_INPUT_FILENAME "HalfInput.txt"
 
 #ifdef DEFAULT_INPUT_FILENAME_A
-  #define DEFAULT_INPUT_FILENAME "testInput003.txt"
-#endif
-#ifdef DEFAULT_INPUT_FILENAME_B
-  #define DEFAULT_INPUT_FILENAME "sinput0.txt"
-#endif
-#ifdef DEFAULT_INPUT_FILENAME_C
   #define DEFAULT_INPUT_FILENAME "input.txt"
 #endif
+#ifdef DEFAULT_INPUT_FILENAME_B
+  #define DEFAULT_INPUT_FILENAME "testInput003.txt"
+#endif
+#ifdef DEFAULT_INPUT_FILENAME_C
+  #define DEFAULT_INPUT_FILENAME "sinput0.txt"
+#endif
+#ifdef DEFAULT_INPUT_FILENAME_D
+  #define DEFAULT_INPUT_FILENAME "sinput1.txt"
+#endif
+#ifdef DEFAULT_INPUT_FILENAME_E
+  #define DEFAULT_INPUT_FILENAME "sinput2.txt"
+#endif
+#ifdef DEFAULT_INPUT_FILENAME_F
+  #define DEFAULT_INPUT_FILENAME "sinput3.txt"
+#endif
+#ifdef DEFAULT_INPUT_FILENAME_G
+  #define DEFAULT_INPUT_FILENAME "sinput4.txt"
+#endif
+#ifdef DEFAULT_INPUT_FILENAME_H
+  #define DEFAULT_INPUT_FILENAME "sinput0.txt"
+#endif
 
-//#define _DEBUG_PROCESS_INPUT
+
 
 #ifdef _DEBUG_PROCESS_INPUT
 #define DEBUG_PROCESS_INPUT(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
@@ -31,7 +43,6 @@ extern int nnn;
 #define DEBUG_PROCESS_INPUT(args...)
 #endif
 
-//#define _DEBUG_DFS
 
 #ifdef _DEBUG_DFS
 #define DEBUG_DFS(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
@@ -39,7 +50,11 @@ extern int nnn;
 #define DEBUG_DFS(args...)
 #endif
 
-#define _DEBUG
+#ifdef _DEBUG_MAIN
+#define DEBUG_MAIN(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
+#else
+#define DEBUG_MAIN(args...)
+#endif
 
 #ifdef _DEBUG
 #define DEBUG(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)

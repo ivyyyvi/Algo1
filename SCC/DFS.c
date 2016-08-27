@@ -183,7 +183,7 @@ DFS_Loop (
         append (currentIndex, vertices_visited, num_vertices_visited);
         num_vertices_visited++;
 
-#ifdef _DEBUG
+#ifdef _DEBUG_DFS
         //DEBUG_DFS ("        => Trace of visited vertex: { ");
         //for (int ppp = 0; ppp < num_vertices_visited; ppp++) {
           //DEBUG_DFS ("%d ", vertices_visited[ppp]);
@@ -241,7 +241,7 @@ DFS_Loop (
                           vertices_to_visit);
             } // if vertices_to_visit array size too small
 
-#ifdef _DEBUG
+#ifdef _DEBUG_DFS
             DEBUG_DFS ("      => vertices_to_visit: [ ");
             for (int k = 0; k < num_vertices_to_visit; k++) {
               printf ("%d ", vertices_to_visit[k]);
@@ -255,7 +255,7 @@ DFS_Loop (
         if (currentVertexFinished) {
           DEBUG_DFS ("      V[%d] finished.\n",\
                       currentVertex->index);
-#ifdef _DEBUG
+#ifdef _DEBUG_DFS
           DEBUG_DFS ("      => vertices_visited: [ ");
           for (int k = 0; k < num_vertices_visited; k++) {
             printf ("%d ", vertices_visited[k]);
@@ -320,7 +320,7 @@ DFS_Loop (
         index_sequence_by_finish_time [ttt] = takeoutIndex;
 
 
-#ifdef _DEBUG
+#ifdef _DEBUG_DFS
         DEBUG_DFS ("  -2- here?? finish on f(%d) = (%d) *****\n\n",\
                     takeoutIndex, \
                     ttt);

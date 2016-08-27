@@ -172,8 +172,8 @@ int main ()
   DEBUG ("time spent on DFS_Loop 1st pass (%f)\n", time_spent_Pass1);
   DEBUG ("------------------------------------\n");
 
-#ifdef _DEBUG
-  DEBUG ("reverse_seq_for_secondpass is: [ ");
+#ifdef _DEBUG_MAIN
+  DEBUG_MAIN ("reverse_seq_for_secondpass is: [ ");
   for (int i = 1; i <= _numberVertices; i++) {
     printf ("%d ", reverse_seq_for_secondpass [i]);
   }
@@ -215,7 +215,7 @@ int main ()
 
   qsort(leaderContainingNodes, (_numberVertices + 1), sizeof(int), compare_ints);
 
-  DEBUG ("leaderContainingNodes is: [ ");
+  printf ("leaderContainingNodes is: [ ");
   for (int i = 0; i < 6; i++) {
     printf ("%d ", leaderContainingNodes[_numberVertices - i]);
   }
