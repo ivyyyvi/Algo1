@@ -131,6 +131,13 @@ DFS_Loop (
 
         currentVertex->leader = currentLeaderIndex; // set leader
 
+        if (which_pass == 2) {
+          DEBUG_DFS ("  ,V[%d]'s leader= V[%d]\n",\
+                      currentVertex->index,\
+                      currentLeaderIndex);
+        }
+
+
         if (leader_group) {
           //
           // leader group
@@ -231,6 +238,14 @@ DFS_Loop (
 
 
         if (currentVertexFinished) {
+          DEBUG_DFS ("      V[%d] finished.\n",\
+                      currentVertex->index);
+#ifdef _DEBUG
+            DEBUG_DFS ("      => vertices_visited: [ ");
+            for (int k = 0; k < num_vertices_visited; k++) {
+              printf ("%d ", vertices_visited[k]);
+            } printf ("]\n\n");
+#endif
 
           //
           // Alright, currentVertex finished its job!
@@ -259,9 +274,9 @@ DFS_Loop (
           // Or it would on a wrong place to award them!
           // Its parent needs to see.
           //
-          DEBUG_DFS ("Who is at front seat of vertices_visited "
-                     "when (%d) is awarded finish_time ...?\n",\
-                      currentIndex);
+          //DEBUG_DFS ("Who is at front seat of vertices_visited "
+                     //"when (%d) is awarded finish_time ...?\n",\
+                      //currentIndex);
           if (vertices_visited[0] == currentVertex->parentVertex) {
 
             DEBUG_DFS ("oh yeah. it is its parent! good!\n");
