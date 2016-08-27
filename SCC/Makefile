@@ -9,12 +9,15 @@ else
  	CFLAGS = -g
 endif
 
-INPUT = a
+INPUT = c
 ifeq ($(INPUT), a)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_A
 
 else ifeq ($(INPUT), b)
 	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_B
+
+else ifeq ($(INPUT), c)
+	CFLAGS += -g -DDEFAULT_INPUT_FILENAME_C
 endif
 
 CC = gcc

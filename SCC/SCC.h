@@ -19,6 +19,9 @@ extern int nnn;
 #ifdef DEFAULT_INPUT_FILENAME_B
   #define DEFAULT_INPUT_FILENAME "sinput0.txt"
 #endif
+#ifdef DEFAULT_INPUT_FILENAME_C
+  #define DEFAULT_INPUT_FILENAME "input.txt"
+#endif
 
 //#define _DEBUG_PROCESS_INPUT
 
@@ -28,7 +31,7 @@ extern int nnn;
 #define DEBUG_PROCESS_INPUT(args...)
 #endif
 
-#define _DEBUG_DFS
+//#define _DEBUG_DFS
 
 #ifdef _DEBUG_DFS
 #define DEBUG_DFS(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
