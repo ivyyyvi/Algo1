@@ -90,7 +90,7 @@ int main ()
   // to all the other vertices
   // using Dijkstra's algo
   //
-  
+
   DEBUG_MAIN ("Calling Dijkstra...\n");
   if (Dijkstra (_A, totalVertices, _E_exact, exactNumEdges)) {
     DEBUG_MAIN ("Fail at Dijkstra()\n");
