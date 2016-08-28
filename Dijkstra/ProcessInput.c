@@ -9,9 +9,10 @@ ReadInput (edge *E, int *numEdge, int *numVertices)
   char ReturnFlag = 0;
   enum readingFlag flag;
   int currentReadNum;
+  int currentTail;
   int vertexIndexMax = 0;
   int verticesCount = 0;
-  int edgesCount = 0;
+  int edgeIndex = 1; // 1-base
   edge* currentEdge = NULL;
 
   char currentChar;
@@ -37,7 +38,8 @@ ReadInput (edge *E, int *numEdge, int *numVertices)
 
   flag = isAfterNewLineCR;
   for (int tracker = 0; tracker < pos; tracker++) {
-    DEBUG_PROCESS_INPUT ("%dth byte = 0x%x = %c \n",\
+
+    //DEBUG_PROCESS_INPUT ("%dth byte = 0x%x = %c \n",\
                           tracker,\
                           bytes[tracker],\
                           bytes[tracker]);
@@ -48,7 +50,7 @@ ReadInput (edge *E, int *numEdge, int *numVertices)
     // accumulatedly collect digits of number in currentReadNum
     //
     if (currentChar >= 0x30 && currentChar <= 0x39) {
-      DEBUG_PROCESS_INPUT ("_%d_ \n", (currentChar - 0x30));
+      //DEBUG_PROCESS_INPUT ("_%d_ \n", (currentChar - 0x30));
       currentReadNum = currentReadNum * 10 + (currentChar - 0x30);
       collectFlag = 1;
     } else {
@@ -57,7 +59,7 @@ ReadInput (edge *E, int *numEdge, int *numVertices)
       // The character reading here is not a number.
       // so first see what we have collected bfr this non-number char.
       //
-      DEBUG_PROCESS_INPUT ("collectFlag = %d\n", collectFlag);
+      //DEBUG_PROCESS_INPUT ("collectFlag = %d\n", collectFlag);
       if (collectFlag == 1) {
 
         //
@@ -83,30 +85,43 @@ ReadInput (edge *E, int *numEdge, int *numVertices)
             if (currentReadNum > vertexIndexMax) {
               vertexIndexMax = currentReadNum;
             }
-            verticesCount++;//1-base
+            verticesCount++;
             DEBUG_PROCESS_INPUT ("verticesCount++ to (%d)\n", verticesCount);
-            currentEdge = &E[verticesCount];
+            //currentEdge = &E[verticesCount]; //E is 1-based //fatal error
+            currentEdge = &E[edgeIndex];
             if (currentEdge) {
-              DEBUG_PROCESS_INPUT ("1 Read (%d) as tailIndex\n", currentReadNum);
+              //DEBUG_PROCESS_INPUT ("1 Read (%d) as tailIndex\n", currentReadNum);
               currentEdge->tailIndex = currentReadNum;
+              currentTail = currentReadNum;
             }
             break;
           case isAfterComma:
             if (currentEdge) {
-              DEBUG_PROCESS_INPUT ("3 Read (%d) as weight\n", currentReadNum);
+              //DEBUG_PROCESS_INPUT ("3 Read (%d) as weight\n", currentReadNum);
+              currentEdge->tailIndex = currentTail;
               currentEdge->weight = currentReadNum;
-              edgesCount++;
-              DEBUG_PROCESS_INPUT ("-----So this is %dth edge = "
+              edgeIndex++;
+              DEBUG_PROCESS_INPUT ("So this is %dth edge = "
                                    " (%d, %d; %d)\n",\
-                                    edgesCount,\
+                                    edgeIndex - 1,\
                                     currentEdge->tailIndex,\
                                     currentEdge->headIndex,\
                                     currentEdge->weight);
+              DEBUG_PROCESS_INPUT ("and in E[%d] = "
+                                   " (%d, %d; %d)\n",\
+                                    edgeIndex - 1,\
+                                    E[edgeIndex - 1].tailIndex,\
+                                    E[edgeIndex - 1].headIndex,\
+                                    E[edgeIndex - 1].weight);
+              //
+              // update the pointer
+              //
+              currentEdge = &E[edgeIndex];
             }
             break;
           case isAfterTab:
             if (currentEdge) {
-              DEBUG_PROCESS_INPUT ("2 Read (%d) as headIndex\n", currentReadNum);
+              //DEBUG_PROCESS_INPUT ("2 Read (%d) as headIndex\n", currentReadNum);
               currentEdge->headIndex = currentReadNum;
             }
             break;
@@ -133,19 +148,19 @@ ReadInput (edge *E, int *numEdge, int *numVertices)
 
         case ASCII_CODE_CARRIAGE_RETURN:
         case ASCII_CODE_NEWLINE:
-          DEBUG_PROCESS_INPUT ("The next number is leading number of a line => (tail) vertex index\n");
+          //DEBUG_PROCESS_INPUT ("The next number is leading number of a line => (tail) vertex index\n");
           flag = isAfterNewLineCR;
           break;
 
         case ASCII_CODE_COMMA:
-          DEBUG_PROCESS_INPUT ("The next number is the number after comma => weight\n");
+          //DEBUG_PROCESS_INPUT ("The next number is the number after comma => weight\n");
           flag = isAfterComma;
           break;
 
         case ASCII_CODE_TAB:
-          DEBUG_PROCESS_INPUT ("The next reading could be"
-                               "(head) vertex index"
-                               "or a newline then a new vertex\n");
+          //DEBUG_PROCESS_INPUT ("The next reading could be"
+                               //"(head) vertex index"
+                               //"or a newline then a new vertex\n");
           flag = isAfterTab;
           break;
         default:
@@ -162,7 +177,7 @@ ReadInput (edge *E, int *numEdge, int *numVertices)
   DEBUG_PROCESS_INPUT ("End processing bytes\n");
   free(bytes); // free allocated memory
 
-  *numEdge = edgesCount;
+  *numEdge = edgeIndex - 1; // minus 1 for last edgeIndex++
   *numVertices = vertexIndexMax;
   return 0;
 } // ReadInput

@@ -13,10 +13,10 @@
 #endif
 
 
-#ifdef _DEBUG_DFS
-#define DEBUG_DFS(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
+#ifdef _DEBUG_DIJK
+#define DEBUG_DIJK(format, args...) printf("[%s:%s:%d] \t"format, __FILE__, __FUNCTION__, __LINE__, ##args)
 #else
-#define DEBUG_DFS(args...)
+#define DEBUG_DIJK(args...)
 #endif
 
 #ifdef _DEBUG_MAIN
