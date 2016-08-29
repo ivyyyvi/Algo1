@@ -16,7 +16,7 @@ ReadFileToAdjList (
 
   char ch;
   int ttsize;
-  int collect;
+  int collect = 0;
   int edgeStart = 1;
 
   char file_name[100] = DEFAULT_INPUT_FILENAME;
@@ -125,7 +125,7 @@ ReadFileToAdjList (
         collect = 0;
 
         //
-        // use max of num saw to be the vertices number
+        // use max of num saw to be the vertices count
         // this assumes vertices index are continual no skipping
         //
         if (num > num_max) {
@@ -138,6 +138,9 @@ ReadFileToAdjList (
           // the num collected here is the start (tail) index of vertex of an edge
           pCurrentVertex = &pv [num];
           pCurrentVertex->index = num;
+          DEBUG_PROCESS_INPUT ("G: V[%d].index = %d\n",\
+                                pCurrentVertex->index,\
+                                num);
 
           // for reverse G, the num collected here is the end (head) of vertex of an edge
           temp_head = num;
@@ -167,7 +170,7 @@ ReadFileToAdjList (
           //
           // the num here collected is the end (head) of an edge
           //
-          pCurrentVertex->connectTo [pCurrentVertex->degree] = num;//0-base
+          pCurrentVertex->connectTo [pCurrentVertex->degree] = num;// connectTo is 0-base
           pCurrentVertex->degree++;
           DEBUG_PROCESS_INPUT ("Collected Edge (%d, %d)\n", pCurrentVertex->index, pCurrentVertex->connectTo [pCurrentVertex->degree - 1]);
 
@@ -176,6 +179,9 @@ ReadFileToAdjList (
           //
           pCurrentVertex_reverse = &pv_reverse [num];
           pCurrentVertex_reverse->index = num;
+          DEBUG_PROCESS_INPUT ("Grev: rV[%d].index = %d\n",\
+                                pCurrentVertex_reverse->index,\
+                                num);
           // already knew the end (head) of the edge, now fill it in.
           pCurrentVertex_reverse->connectTo [pCurrentVertex_reverse->degree] = temp_head;
           pCurrentVertex_reverse->degree++;
