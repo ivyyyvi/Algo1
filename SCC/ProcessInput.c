@@ -137,10 +137,6 @@ ReadFileToAdjList (
 
           // the num collected here is the start (tail) index of vertex of an edge
           pCurrentVertex = &pv [num];
-          pCurrentVertex->index = num;
-          DEBUG_PROCESS_INPUT ("G: V[%d].index = %d\n",\
-                                pCurrentVertex->index,\
-                                num);
 
           // for reverse G, the num collected here is the end (head) of vertex of an edge
           temp_head = num;
@@ -172,16 +168,11 @@ ReadFileToAdjList (
           //
           pCurrentVertex->connectTo [pCurrentVertex->degree] = num;// connectTo is 0-base
           pCurrentVertex->degree++;
-          DEBUG_PROCESS_INPUT ("Collected Edge (%d, %d)\n", pCurrentVertex->index, pCurrentVertex->connectTo [pCurrentVertex->degree - 1]);
 
           //
           // for reverse G, the num collected is the start (tail) of an edge
           //
           pCurrentVertex_reverse = &pv_reverse [num];
-          pCurrentVertex_reverse->index = num;
-          DEBUG_PROCESS_INPUT ("Grev: rV[%d].index = %d\n",\
-                                pCurrentVertex_reverse->index,\
-                                num);
           // already knew the end (head) of the edge, now fill it in.
           pCurrentVertex_reverse->connectTo [pCurrentVertex_reverse->degree] = temp_head;
           pCurrentVertex_reverse->degree++;

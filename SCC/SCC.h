@@ -109,7 +109,6 @@ DFS_Loop (
 
 
 struct _vertex {
-  int index;
   int degree;
   int Explored;
   int leader;

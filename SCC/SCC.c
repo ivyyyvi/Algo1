@@ -150,13 +150,6 @@ int main ()
   intArray                   = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
   reverse_seq_for_secondpass [0] = 0; // this slot is not used
 
-  for (int i = 1; i <= _numberVertices; i++) {
-    DEBUG_MAIN ("V[%d] has index (%d)\n", i, _V[i].index);
-  }
-  for (int i = 1; i <= _numberVertices; i++) {
-    DEBUG_MAIN ("rV[%d] has index (%d)\n", i, _rV[i].index);
-  }
-
   DEBUG ("Calling 1st pass DFS_Loop, #v (%d) ...\n", _numberVertices);
   ret = DFS_Loop (
           1,

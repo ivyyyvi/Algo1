@@ -146,13 +146,6 @@ DFS_Loop (
 
         currentVertex->leader = currentLeaderIndex; // set leader
 
-        if (which_pass == 2) {
-          DEBUG_DFS ("  ,V[%d]'s leader= V[%d]\n",\
-                      currentVertex->index,\
-                      currentLeaderIndex);
-        }
-
-
         if (leader_group) {
           //
           // leader group
@@ -253,8 +246,6 @@ DFS_Loop (
 
 
         if (currentVertexFinished) {
-          DEBUG_DFS ("      V[%d] finished.\n",\
-                      currentVertex->index);
 #ifdef _DEBUG_DFS
           DEBUG_DFS ("      => vertices_visited: [ ");
           for (int k = 0; k < num_vertices_visited; k++) {
