@@ -146,9 +146,11 @@ int main ()
   DEBUG ("time spent on reading file (%f)\n\n", time_spent_readFile);
   DEBUG ("------------------------------------\n");
 
-  reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
-  intArray                   = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
-  reverse_seq_for_secondpass [0] = 0; // this slot is not used
+  //reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
+  //intArray                   = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
+  //reverse_seq_for_secondpass [0] = 0; // this slot is not used
+  reverse_seq_for_secondpass = calloc ((_numberVertices + 1), sizeof (int)); // 1-based
+  intArray                   = calloc ((_numberVertices + 1), sizeof (int)); // 1-based
 
   DEBUG ("Calling 1st pass DFS_Loop, #v (%d) ...\n", _numberVertices);
   ret = DFS_Loop (
