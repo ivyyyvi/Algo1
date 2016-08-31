@@ -12,7 +12,6 @@ ReadFileToAdjList (
   int temp_head;
   long int mmm; // max number of edges just for alloc
   long int mmm_reverse; // max number of edges just for alloc
-  int degreeMax = 5;
 
   char ch;
   int ttsize;
@@ -22,7 +21,7 @@ ReadFileToAdjList (
   char file_name[100];
 #if ASK_FOR_INPUT
 #else
-  char default_file_name[100] = DEFAULT_INPUT_FILENAME;
+  char default_file_name[100] = "./input_A.txt";
 #endif
   char *tracker;
   FILE *fp;
@@ -85,11 +84,13 @@ ReadFileToAdjList (
   pv_reverse = calloc (nnn, sizeof(vertex));
 
   // alloc pool for edge incidented on the vertex
+  
   for (int i = 0; i < nnn; i++) {
-    (pv + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-    memset ((pv + i)->connectTo, 0, sizeof(int)*(degreeMax));
-    (pv_reverse + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-    memset ((pv_reverse + i)->connectTo, 0, sizeof(int)*(degreeMax));
+    (pv + i)->degreeMax = 1; // for now. realloc when needed // todo
+    (pv + i)->connectTo = malloc (sizeof (int)*((pv + i)->degreeMax));
+    memset ((pv + i)->connectTo, 0, sizeof(int)*((pv + i)->degreeMax));
+    (pv_reverse + i)->connectTo = malloc (sizeof (int)*((pv + i)->degreeMax));
+    memset ((pv_reverse + i)->connectTo, 0, sizeof(int)*((pv + i)->degreeMax));
   }
 
   //
@@ -119,7 +120,7 @@ ReadFileToAdjList (
         //
         // If array size is not enough, double the array size.
         //
-        DEBUG_PROCESS_INPUT ("-------vertice pool not enough! (%d)\n", degreeMax);
+        DEBUG_PROCESS_INPUT ("-------vertice pool not enough! (%d)\n", nnn);
         nnn *= 2;
         free (pv);
         pv = malloc (sizeof (vertex) * nnn);
@@ -156,17 +157,12 @@ ReadFileToAdjList (
           //
           // if degreeMax not big enough, double it
           //
-          if (pCurrentVertex->degree >= degreeMax) {
-            DEBUG_PROCESS_INPUT ("-------degreeMax (%d) not enough!\n", degreeMax);
-            degreeMax *= 2;
-            for (int i = 0; i < nnn; i++) {
-              free ((pv + i)->connectTo);
-              (pv + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-              memset ((pv + i)->connectTo, 0, sizeof(int)*(degreeMax));
-              free ((pv_reverse + i)->connectTo);
-              (pv_reverse + i)->connectTo = malloc (sizeof (int)*(degreeMax));
-              memset ((pv_reverse + i)->connectTo, 0, sizeof(int)*(degreeMax));
-            }
+          if (pCurrentVertex->degree >= pCurrentVertex->degreeMax) {
+            DEBUG_PROCESS_INPUT ("---V[%d] degreeMax (%d) not enough!\n",\
+                                   temp_head,\
+                                   pCurrentVertex->degreeMax);
+            pCurrentVertex->degreeMax *= 2;
+            pCurrentVertex->connectTo = realloc (pCurrentVertex->connectTo, pCurrentVertex->degreeMax);
           } // if degree Max not big enough // todo, what about the reverse
 
           //
@@ -179,6 +175,18 @@ ReadFileToAdjList (
           // for reverse G, the num collected is the start (tail) of an edge
           //
           pCurrentVertex_reverse = &pv_reverse [num];
+
+          //
+          // if degreeMax not big enough, double it
+          //
+          if (pCurrentVertex_reverse->degree >= pCurrentVertex_reverse->degreeMax) {
+            DEBUG_PROCESS_INPUT ("---V[%d] degreeMax (%d) not enough!\n",\
+                                   num,\
+                                   pCurrentVertex_reverse->degreeMax);
+            pCurrentVertex_reverse->degreeMax *= 2;
+            pCurrentVertex_reverse->connectTo = realloc (pCurrentVertex_reverse->connectTo, pCurrentVertex_reverse->degreeMax);
+          } // if degree Max not big enough // todo, what about the reverse
+
           // already knew the end (head) of the edge, now fill it in.
           pCurrentVertex_reverse->connectTo [pCurrentVertex_reverse->degree] = temp_head;
           pCurrentVertex_reverse->degree++;

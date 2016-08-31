@@ -1,13 +1,13 @@
 
 DEBUG = y
 ifeq ($(DEBUG), y)
-	CFLAGS = -g
+	CFLAGS = -g -std=gnu99
 	CFLAGS += -D_DEBUG
 	CFLAGS += -D_DEBUG_MAIN
 	#CFLAGS += -D_DEBUG_DFS
 	#CFLAGS += -D_DEBUG_PROCESS_INPUT
 else
- 	CFLAGS = -g
+ 	CFLAGS = -g -std=gnu99
 endif
 
 ##INPUT = H

@@ -1,20 +1,6 @@
 
 #include "SCC.h"
 
-int checkChildrenExplored (vertex VertexToCheck, vertex *V){
-
-  int allExplored = 1;
-  int childIndex;
-  for (int yyy = 0; yyy < VertexToCheck.degree; yyy++) {
-    childIndex = VertexToCheck.connectTo[yyy];
-    if (V[childIndex].Explored == 0) {
-      allExplored = 0;
-      break;
-    }
-  }
-
-  return allExplored;
-}
 
 int isInSet (int v, int *Set, int lenOfSet) {
 

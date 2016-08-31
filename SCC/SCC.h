@@ -8,7 +8,7 @@
 extern int nnn;
 
 
-#define ASK_FOR_INPUT 1
+#define ASK_FOR_INPUT 0
 
 // input_Z.txt is the input from PA
 #ifdef DEFAULT_INPUT_FILENAME_Z
@@ -110,7 +110,7 @@ DFS_Loop (
 
 struct _vertex {
   int degree;
-  int Explored;
+  int degreeMax;
   int leader;
   int parentVertex; // parent_add_it_to_vertices_to_visit
   int *connectTo;
