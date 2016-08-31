@@ -4,13 +4,13 @@ ifeq ($(DEBUG), y)
 	CFLAGS = -g
 	CFLAGS += -D_DEBUG
 	CFLAGS += -D_DEBUG_MAIN
-	CFLAGS += -D_DEBUG_DFS
+	#CFLAGS += -D_DEBUG_DFS
 	#CFLAGS += -D_DEBUG_PROCESS_INPUT
 else
  	CFLAGS = -g
 endif
 
-INPUT = H
+##INPUT = H
 ifeq ($(INPUT), Z)
 	CFLAGS += -DDEFAULT_INPUT_FILENAME_Z
 else ifeq ($(INPUT), A)

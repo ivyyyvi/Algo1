@@ -139,7 +139,6 @@ DFS_Loop (
 
         if (which_pass == 2) {
           currentVertex->leader = currentLeaderIndex; // set leader
-          printf ("l%d=%d\n", currentIndex, currentLeaderIndex);
 
           if (leader_group) {
             //
@@ -147,6 +146,7 @@ DFS_Loop (
             //
             leader_group[currentLeaderIndex]++;
           }
+          printf ("l%d=%d / %d\n", currentIndex, currentLeaderIndex, leader_group[currentLeaderIndex]);
         }
 
         append (currentIndex, vertices_visited, num_vertices_visited);

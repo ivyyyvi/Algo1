@@ -8,7 +8,7 @@
 extern int nnn;
 
 
-#define ASK_FOR_INPUT 0
+#define ASK_FOR_INPUT 1
 
 // input_Z.txt is the input from PA
 #ifdef DEFAULT_INPUT_FILENAME_Z

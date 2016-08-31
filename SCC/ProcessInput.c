@@ -19,7 +19,11 @@ ReadFileToAdjList (
   int collect = 0;
   int edgeStart = 1;
 
-  char file_name[100] = DEFAULT_INPUT_FILENAME;
+  char file_name[100];
+#if ASK_FOR_INPUT
+#else
+  char default_file_name[100] = DEFAULT_INPUT_FILENAME;
+#endif
   char *tracker;
   FILE *fp;
   char *bytes;
@@ -37,7 +41,7 @@ ReadFileToAdjList (
 #if ASK_FOR_INPUT
   // get file name from user input
   memset (file_name, 0, sizeof(file_name));//todo
-  DEBUG_PROCESS_INPUT ("Type File name:");
+  printf ("Type File name:");
   fgets (file_name, 100, stdin);
 
   tracker = file_name;
@@ -51,6 +55,8 @@ ReadFileToAdjList (
     }
     tracker++;
   }
+#else 
+  strcpy (file_name, default_file_name);
 #endif
   // open file
   fp = fopen (file_name, "r");  // read mode
