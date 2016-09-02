@@ -29,16 +29,13 @@ DFS_Loop (
   int num_vertices_to_visit = 0;
   int num_vertices_visited = 0;
   int currentOuterForLoopVertexIndex;
-  int currentLeaderIndex;
+  int currentLeaderIndex = 0;
   int currentIndex;
   int currentChildIndex;
   int *vertices_to_visit; // only keep index of vertices
   int *vertices_visited;
   vertex *currentVertex;
   vertex *currentChildVertex;
-
-  // only for 1st pass to compute finish_time, in particular, its sequence
-  int *temp_ptr;
 
   //
   // Initialize vertices_to_visit stack
@@ -77,9 +74,11 @@ DFS_Loop (
         break;
       case 2:
         currentOuterForLoopVertexIndex = index_sequence_by_finish_time_2[sss];
+        // Bookkeeping leader vertex for 2nd pass DFS_Loop.
+        currentLeaderIndex = currentOuterForLoopVertexIndex;
         break;
       default:
-        break;
+        return -1;
     }
 
     DEBUG_DFS ("%d pass. Start to_visit stack from V[%d] ...\n", \
@@ -92,13 +91,6 @@ DFS_Loop (
     *vertices_to_visit = currentOuterForLoopVertexIndex;
     num_vertices_to_visit++;
 
-    //
-    // Bookkeeping leader vertex for 2nd pass DFS_Loop.
-    //
-    currentLeaderIndex = currentOuterForLoopVertexIndex;
-
-    //DEBUG_DFS ("Outer for loop @ %d (leader)\n",\
-    //currentOuterForLoopVertexIndex);
     //
     // while the vertices_to_visit is not empty
     //
@@ -151,6 +143,7 @@ DFS_Loop (
         //
         append (currentIndex, vertices_to_visit, num_vertices_to_visit);
         num_vertices_to_visit++;
+
 #ifdef _DEBUG_DFS
             DEBUG_DFS ("put back V[%d] to vertices_to_visit: [ ", currentIndex);
             for (int k = 0; k < num_vertices_to_visit; k++) {
@@ -163,7 +156,6 @@ DFS_Loop (
         // if not yet in visited stack,
         // append it to vertices_to_visit
         //
-
         for (int j = 0; j < currentVertex->degree; j++) { // diff with lesson
           currentChildIndex = currentVertex->connectTo[j];
           currentChildVertex = &V[currentChildIndex];
@@ -173,10 +165,7 @@ DFS_Loop (
           // if the child vertex is not yet explored,
           // append it to vertices_to_visit.
           //
-          if (isInSet (
-                currentChildIndex,
-                vertices_visited,
-                num_vertices_visited) == 0) {
+          if (isInSet (currentChildIndex, vertices_visited, num_vertices_visited) == 0) {
 
             append (currentChildIndex, vertices_to_visit, num_vertices_to_visit);
             num_vertices_to_visit++;
@@ -218,6 +207,7 @@ DFS_Loop (
     } // while
 
   } // for
+  free (vertices_to_visit);
   free (vertices_visited);
   return 0;
 }

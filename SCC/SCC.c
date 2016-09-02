@@ -216,10 +216,11 @@ int main ()
   DEBUG ("time spent on DFS_Loop 2nd pass (%f)\n", time_spent_Pass2);
   DEBUG ("------------------------------------\n");
 
+  leaderContainingNodes[0] = 0;
   qsort(leaderContainingNodes, (_numberVertices + 1), sizeof(int), compare_ints);
 
   printf ("leaderContainingNodes is: [ ");
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
     printf ("%d ", leaderContainingNodes[_numberVertices - i]);
   }
   printf ("]\n");
