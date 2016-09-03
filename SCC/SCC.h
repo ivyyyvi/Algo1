@@ -7,36 +7,45 @@
 
 extern int nnn;
 
+#pragma once
 
 #define ASK_FOR_INPUT 0
+#define PREFIX_PATH "/Users/ivy/SCC_Xcode/SCC/SCC/"
+
+//for building in Xcode
+#define DEFAULT_INPUT_FILENAME_Z
+//#define _DEBUG_MAIN
+//#define _DEBUG_PROCESS_INPUT
+//#define _DEBUG_DFS
+//#define _DEBUG
 
 // input_Z.txt is the input from PA
 #ifdef DEFAULT_INPUT_FILENAME_Z
-  #define DEFAULT_INPUT_FILENAME "input_Z.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_Z.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_A
-  #define DEFAULT_INPUT_FILENAME "input_A.txt"
+#define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_A.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_B
-  #define DEFAULT_INPUT_FILENAME "input_B.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_B.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_C
-  #define DEFAULT_INPUT_FILENAME "input_C.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_C.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_D
-  #define DEFAULT_INPUT_FILENAME "input_D.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_D.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_E
-  #define DEFAULT_INPUT_FILENAME "input_E.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_E.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_F
-  #define DEFAULT_INPUT_FILENAME "input_F.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_F.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_G
-  #define DEFAULT_INPUT_FILENAME "input_G.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_G.txt"
 #endif
 #ifdef DEFAULT_INPUT_FILENAME_H
-  #define DEFAULT_INPUT_FILENAME "input_H.txt"
+  #define DEFAULT_INPUT_FILENAME "/Users/ivy/SCC_Xcode/SCC/SCC/input_H.txt"
 #endif
 
 #ifdef _DEBUG_PROCESS_INPUT
@@ -109,11 +118,10 @@ DFS_Loop (
 
 
 struct _vertex {
-  int index;
   int degree;
-  int Explored;
+  int degreeMax;
   int leader;
-  int parentVertex; // parent_add_it_to_vertices_to_visit
+  int index; // for debug
   int *connectTo;
 };
 

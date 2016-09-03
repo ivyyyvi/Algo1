@@ -15,9 +15,10 @@ int
 PopEnd (int *wholedeal, int numTotal)
 {
   int vertex_to_pop;
-  vertex_to_pop = wholedeal[numTotal - 1];
+  int offset = numTotal - 1;
+  vertex_to_pop = wholedeal[offset];
   // remove
-  wholedeal[numTotal] = 0;
+  wholedeal[offset] = 0;
 
   return vertex_to_pop;
 }; // removes and returns the end element in the list.
@@ -41,12 +42,12 @@ first (int *wholedeal, int numTotal)
 }; // removes and returns the first element in the list.
 
 void
-append (int vertex_to_append, int *vertices_to_visit, int num_vertices_to_visit)
+append (int vertex_to_append, int *vertices_to_visit, int num_bfr_append)
 {
   //
   // append (of course) to the end of the stack
   //
-  vertices_to_visit[num_vertices_to_visit] = vertex_to_append;
+  vertices_to_visit[num_bfr_append] = vertex_to_append;
   return;
 }
 
@@ -82,6 +83,7 @@ takeout (int vertex_to_takeout, int *vertices, int num_vertices)
       for (int qqq = ppp + 1; qqq < num_vertices; qqq++) {
         vertices [qqq - 1] = vertices [qqq];
       }
+      vertices [num_vertices - 1] = 0;
       break;
     }
   }
@@ -119,7 +121,6 @@ compare_ints (
 
 int main ()
 {
-  char file_name[100] = DEFAULT_INPUT_FILENAME;
   vertex *_V;
   vertex *_rV;
   int _numberVertices;
@@ -138,6 +139,7 @@ int main ()
              &_rV,
              &_numberVertices
              )) {
+    DEBUG("ReadFile error.\n");
     return -1;
   }
 
@@ -146,16 +148,11 @@ int main ()
   DEBUG ("time spent on reading file (%f)\n\n", time_spent_readFile);
   DEBUG ("------------------------------------\n");
 
-  reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
-  intArray                   = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
-  reverse_seq_for_secondpass [0] = 0; // this slot is not used
-
-  for (int i = 1; i <= _numberVertices; i++) {
-    DEBUG_MAIN ("V[%d] has index (%d)\n", i, _V[i].index);
-  }
-  for (int i = 1; i <= _numberVertices; i++) {
-    DEBUG_MAIN ("rV[%d] has index (%d)\n", i, _rV[i].index);
-  }
+  //reverse_seq_for_secondpass = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
+  //intArray                   = malloc (sizeof (int) * (_numberVertices + 1)); // 1-based
+  //reverse_seq_for_secondpass [0] = 0; // this slot is not used
+  reverse_seq_for_secondpass = calloc ((_numberVertices + 1), sizeof (int)); // 1-based
+  intArray                   = calloc ((_numberVertices + 1), sizeof (int)); // 1-based
 
   DEBUG ("Calling 1st pass DFS_Loop, #v (%d) ...\n", _numberVertices);
   ret = DFS_Loop (
@@ -219,10 +216,11 @@ int main ()
   DEBUG ("time spent on DFS_Loop 2nd pass (%f)\n", time_spent_Pass2);
   DEBUG ("------------------------------------\n");
 
+  leaderContainingNodes[0] = 0;
   qsort(leaderContainingNodes, (_numberVertices + 1), sizeof(int), compare_ints);
 
   printf ("leaderContainingNodes is: [ ");
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
     printf ("%d ", leaderContainingNodes[_numberVertices - i]);
   }
   printf ("]\n");
